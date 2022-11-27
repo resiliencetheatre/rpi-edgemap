@@ -1,0 +1,14 @@
+[Unit]
+Description=curlcot
+After=multi-user.target taky.service
+
+[Service]
+WorkingDirectory=/opt/edgemap/curlcot
+KillMode=process
+ExecStart=curlcot -i curlcot.ini
+Restart=always
+RestartSec=2
+TimeoutStartSec=5
+
+[Install]
+WantedBy=multi-user.target

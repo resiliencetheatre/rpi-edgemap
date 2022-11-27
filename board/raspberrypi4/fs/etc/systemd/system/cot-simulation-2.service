@@ -1,0 +1,14 @@
+[Unit]
+Description=CoT simulation target #2
+After=multi-user.target taky.service
+
+[Service]
+WorkingDirectory=/opt/edgemap/cotsim
+KillMode=process
+ExecStart=cotsim -i cotsim-1406.ini > /dev/null 2>&1
+Restart=always
+RestartSec=5
+TimeoutStartSec=5
+
+[Install]
+WantedBy=multi-user.target
