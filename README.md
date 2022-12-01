@@ -55,5 +55,13 @@ ln -s /mnt/mbtiles/us.mbtiles .
 
 Third partition is automaticly mounted (as read only) to /mnt
 
+## Support the Arabic and Hebrew languages righ-to-left rendering
 
+First clone this repository:
+
+```
+git clone https://github.com/mapbox/mapbox-gl-rtl-text
+```
+
+Copy mapbox-gl-rtl-text.js to /opt/edgemap/edgemap-webui/js/ folder.
 
