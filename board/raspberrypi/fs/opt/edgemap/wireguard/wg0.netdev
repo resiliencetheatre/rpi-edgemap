@@ -1,0 +1,15 @@
+[NetDev]
+Name=wg0
+Kind=wireguard
+Description=WireGuard tunnel wg0
+
+[WireGuard]
+ListenPort=51871
+PrivateKeyFile=/etc/systemd/network/[KEYFILENAME]
+
+[WireGuardPeer]
+PublicKey=[SERVER PUBLIC KEY STRING]
+PresharedKeyFile=/etc/systemd/network/[PRESHARED KEY FILENAME]
+AllowedIPs=10.0.0.0/24, 0.0.0.0/0
+Endpoint=[IP]:[PORT]
+

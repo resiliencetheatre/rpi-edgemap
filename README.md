@@ -19,7 +19,10 @@ Create build directory and clone repositories:
 mkdir ~/build-directory
 cd ~/build-directory
 git clone https://git.buildroot.net/buildroot
-git clone https://codeberg.org/48554e6d/rpi-edgemap.git
+cd buildroot
+git checkout 2023.02
+cd ~/build-directory
+git clone https://github.com/resiliencetheatre/rpi-edgemap.git
 ```
 
 You might need to checkout LTS (or e3c14de0dfc047817917fb4dbc20c211e751bb3f) version of buildroot if you face build difficulties.

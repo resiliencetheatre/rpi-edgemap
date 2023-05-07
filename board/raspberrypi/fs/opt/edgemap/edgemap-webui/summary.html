@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EdgeMap</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/w3.css">
+</head>
+<body>
+
+<style>
+h2 {
+  color: blue;
+}
+</style>
+
+<center>
+	<h1>EdgeMap - technical summary</h1>
+
+<div class="w3-card-4 w3-margin" style="width:90%; height:50%; padding:50px;">
+  
+  <div class="w3-display-container w3-text-white">
+    
+  </div>
+  
+<div class="w3-row">
+    <div class="w3-center">
+     <img src="img/rpi-edgemap-front-page.png" style="width:100%; border:1px solid black;">
+    </div>  
+</div>
+  
+  
+  
+</div>
+</center>
+
+<div style="width:100%;  padding:50px; 10px;">
+	
+	EdgeMap is <a href="https://buildroot.org/">buildroot</a> built <i>embedded linux firmware</i> for Raspberry Pi 4, 
+	which provides stand alone <a href="https://github.com/maplibre/maplibre-gl-js">web map</a> appliance 
+	and Curson on Target (CoT) <a href="https://github.com/tkuester/taky">server.</a>
+	 
+	<p>
+	It can be used to rapidly prototype off the grid mapping application integrations and it's ability
+	to render targets from websocket provided data stream makes it interesting test platform for fast rate navigation sources.
+	With EdgeMap you can have one SD card which holds Operating System, web server, off the grid map data and CoT server. 
+	<p>
+	EdgeMap is NOT production ready solution as such, but provides understandable, compact and minimized code base for given task. 
+	Main goal has been minimazing dependencies, keeping things simple and wihtout bloated or vendor controlled technologies.
+	</p>
+	<h2>Resilience</h2>
+	<p>EdgeMap is created as an resilience example, where your Operating System image is created from source code which you have
+	at hand. Buildroot build can be kept offline and on premises, supporing your mission critical deployment tasks in any situation.
+	This same approach can be used with OSM map data creation, where mbtiles are produced 'on prem' as well. This makes it possible
+	to have security of supply and resilience for solution to be available in any circumstances.</p>
+	<h2>Prototyping</h2>
+	You can use EdgeMap for fast prototyping. You can push data to sqlite3 database and write small PHP script to retrieve that as GeoJSON,
+	which is then displayed on map (this example is provided on image). Another example included is <i>high rate</i> websocket stream for 
+	highly movable target data, where target position is updated 20 Hz (or above) rate.
+	
+	
+	<center>
+		<div class="w3-card-4 w3-margin" style="width:95%; height:50%; padding:20px;">
+			<div class="w3-center">
+			 <img src="img/system-diagram.png" style="width:100%; border:1px solid black;">
+			</div>  	
+		</div>
+	</center>
+	
+	
+	<p>Additional two examples are 'Sniper Control' and 'Messaging' panels, which do read websocket data as well for low latency state
+	updates.</p>
+	<h2>Firmware</h2>
+	We call this image 'firmware' and not 'linux distribution', which illustrates best what it's made for: small embedded Linux tailored
+	for defined task. As it's purpose built 'firmaware' - you cannot install packages to image directly, you need to compile image with 
+	buildroot and deploy it via SD card.
+	<p>We believe this approach is effecient and well defined when control and resilience are targeted on mission critical embedded Linux 
+	solutions. Given approach leaves all bloated distro specific parts out and creates small fast booting embedded firmware for you
+	mission critical integrations.</p>
+	<h2>Software</h2>
+	As all of software components are freely available, you may of course install EdgeMap on any Linux distribution and make it run big time.
+	Or use your laptop with php enabled apache to display small map from locally stored mbtiles. Check our github for more details and download
+	this 'one php file' for testing. 
+	<h2>Contact us</h2>
+	Feel free to contact us in case you have any questions or comments!
+</p>
+</div>
+
+<p><center><a href="index.html">Back to front page</a></center></p>
+
+<center><a href="#" title="Github"><img src="img/github.png" style="width:50px;"></a></center>
+
+
+
+</body>
+</html> 
