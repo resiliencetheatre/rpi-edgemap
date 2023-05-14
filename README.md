@@ -25,7 +25,7 @@ cd ~/build-directory
 git clone https://github.com/resiliencetheatre/rpi-edgemap.git
 ```
 
-You might need to checkout LTS (or e3c14de0dfc047817917fb4dbc20c211e751bb3f) version of buildroot if you face build difficulties.
+You might need to checkout LTS 2023.02 version of buildroot if you face build difficulties.
 
 Define _external tree_ location to **BR2_EXTERNAL** variable:
 
@@ -67,4 +67,18 @@ git clone https://github.com/mapbox/mapbox-gl-rtl-text
 ```
 
 Copy mapbox-gl-rtl-text.js to /opt/edgemap/edgemap-webui/js/ folder.
+
+## Upcoming planet version
+
+This repository contains configuration for upcoming 'planet' version, where separate country maps are replaced with full world 'planet.mbtiles'. 
+
+Tested buildroot master commit id:
+
+```
+271745c37a044310e2c4a2142ace48f66914df2c
+```
+
+New version will use 'tileserver-gl-light' to serve planet.mbtiles.
+
+
 
