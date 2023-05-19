@@ -80,5 +80,8 @@ Tested buildroot master commit id:
 
 New version will use 'tileserver-gl-light' to serve planet.mbtiles.
 
+### Tileserver service
+
+You need to modify /etc/systemd/system/tileserver.service with your external IP address so it can serve right URL for maplibre-gl.
 
 

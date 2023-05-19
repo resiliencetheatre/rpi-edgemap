@@ -3,12 +3,7 @@
 // by tileserver-gl-light running on RPi4 image.
 // 
 // 
-// dynamic style
-//
-// var styleDynamic = 'styles/style.json';
-var styleDynamic = 'styles/dyn-osm-liberty.json';
-var styleRaster = 'styles/raster.json';
-
+var styleDynamic = 'styles/style.json.osmliberty';
 // 
 // To get boundaries from mbtiles file, visit (tileserver-gl-light): 
 // http://localhost:8080/data/v3.json

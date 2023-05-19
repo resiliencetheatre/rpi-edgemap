@@ -1,0 +1,18 @@
+<html>
+<head>
+<script src='js/maplibre-gl.js'></script>
+<link href='js/maplibre-gl.css' rel='stylesheet' />
+</head>
+
+<div id='map' style='width: 100%; height: 100%;'></div>
+<script>
+var map = new maplibregl.Map({
+  container: 'map',
+  style: 'styles/style.json.osmliberty', // stylesheet location
+  center: [-74.5, 40], // starting position [lng, lat]
+  zoom: 9 // starting zoom
+});
+</script>
+
+
+</html>
