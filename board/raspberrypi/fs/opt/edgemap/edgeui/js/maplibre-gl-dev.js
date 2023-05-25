@@ -1,4 +1,4 @@
-/* MapLibre GL JS is licensed under the 3-Clause BSD License. Full text of license: https://github.com/maplibre/maplibre-gl-js/blob/v3.0.0-pre.7/LICENSE.txt */
+/* MapLibre GL JS is licensed under the 3-Clause BSD License. Full text of license: https://github.com/maplibre/maplibre-gl-js/blob/v3.0.0/LICENSE.txt */
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 typeof define === 'function' && define.amd ? define(factory) :
@@ -1233,10 +1233,21 @@ const getArrayBuffer = function (requestParameters, callback) {
 const postData = function (requestParameters, callback) {
     return makeRequest(extend(requestParameters, { method: 'POST' }), callback);
 };
-function sameOrigin(url) {
-    const a = window.document.createElement('a');
-    a.href = url;
-    return a.protocol === window.document.location.protocol && a.host === window.document.location.host;
+function sameOrigin(inComingUrl) {
+    // URL class should be available everywhere
+    // https://developer.mozilla.org/en-US/docs/Web/API/URL
+    // In addtion, a relative URL "/foo" or "./foo" will throw exception in its ctor,
+    // try-catch is expansive so just use a heuristic check to avoid it
+    // also check data URL
+    if (!inComingUrl ||
+        inComingUrl.indexOf('://') <= 0 || // relative URL
+        inComingUrl.indexOf('data:image/') === 0 || // data image URL
+        inComingUrl.indexOf('blob:') === 0) { // blob
+        return true;
+    }
+    const urlObj = new URL(inComingUrl);
+    const locationObj = window.location;
+    return urlObj.protocol === locationObj.protocol && urlObj.host === locationObj.host;
 }
 const getVideo = function (urls, callback) {
     const video = window.document.createElement('video');
@@ -1388,460 +1399,6 @@ class Evented {
         return this;
     }
 }
-
-var colorString$2 = {exports: {}};
-
-'use strict';
-
-var colorName = {
-	"aliceblue": [240, 248, 255],
-	"antiquewhite": [250, 235, 215],
-	"aqua": [0, 255, 255],
-	"aquamarine": [127, 255, 212],
-	"azure": [240, 255, 255],
-	"beige": [245, 245, 220],
-	"bisque": [255, 228, 196],
-	"black": [0, 0, 0],
-	"blanchedalmond": [255, 235, 205],
-	"blue": [0, 0, 255],
-	"blueviolet": [138, 43, 226],
-	"brown": [165, 42, 42],
-	"burlywood": [222, 184, 135],
-	"cadetblue": [95, 158, 160],
-	"chartreuse": [127, 255, 0],
-	"chocolate": [210, 105, 30],
-	"coral": [255, 127, 80],
-	"cornflowerblue": [100, 149, 237],
-	"cornsilk": [255, 248, 220],
-	"crimson": [220, 20, 60],
-	"cyan": [0, 255, 255],
-	"darkblue": [0, 0, 139],
-	"darkcyan": [0, 139, 139],
-	"darkgoldenrod": [184, 134, 11],
-	"darkgray": [169, 169, 169],
-	"darkgreen": [0, 100, 0],
-	"darkgrey": [169, 169, 169],
-	"darkkhaki": [189, 183, 107],
-	"darkmagenta": [139, 0, 139],
-	"darkolivegreen": [85, 107, 47],
-	"darkorange": [255, 140, 0],
-	"darkorchid": [153, 50, 204],
-	"darkred": [139, 0, 0],
-	"darksalmon": [233, 150, 122],
-	"darkseagreen": [143, 188, 143],
-	"darkslateblue": [72, 61, 139],
-	"darkslategray": [47, 79, 79],
-	"darkslategrey": [47, 79, 79],
-	"darkturquoise": [0, 206, 209],
-	"darkviolet": [148, 0, 211],
-	"deeppink": [255, 20, 147],
-	"deepskyblue": [0, 191, 255],
-	"dimgray": [105, 105, 105],
-	"dimgrey": [105, 105, 105],
-	"dodgerblue": [30, 144, 255],
-	"firebrick": [178, 34, 34],
-	"floralwhite": [255, 250, 240],
-	"forestgreen": [34, 139, 34],
-	"fuchsia": [255, 0, 255],
-	"gainsboro": [220, 220, 220],
-	"ghostwhite": [248, 248, 255],
-	"gold": [255, 215, 0],
-	"goldenrod": [218, 165, 32],
-	"gray": [128, 128, 128],
-	"green": [0, 128, 0],
-	"greenyellow": [173, 255, 47],
-	"grey": [128, 128, 128],
-	"honeydew": [240, 255, 240],
-	"hotpink": [255, 105, 180],
-	"indianred": [205, 92, 92],
-	"indigo": [75, 0, 130],
-	"ivory": [255, 255, 240],
-	"khaki": [240, 230, 140],
-	"lavender": [230, 230, 250],
-	"lavenderblush": [255, 240, 245],
-	"lawngreen": [124, 252, 0],
-	"lemonchiffon": [255, 250, 205],
-	"lightblue": [173, 216, 230],
-	"lightcoral": [240, 128, 128],
-	"lightcyan": [224, 255, 255],
-	"lightgoldenrodyellow": [250, 250, 210],
-	"lightgray": [211, 211, 211],
-	"lightgreen": [144, 238, 144],
-	"lightgrey": [211, 211, 211],
-	"lightpink": [255, 182, 193],
-	"lightsalmon": [255, 160, 122],
-	"lightseagreen": [32, 178, 170],
-	"lightskyblue": [135, 206, 250],
-	"lightslategray": [119, 136, 153],
-	"lightslategrey": [119, 136, 153],
-	"lightsteelblue": [176, 196, 222],
-	"lightyellow": [255, 255, 224],
-	"lime": [0, 255, 0],
-	"limegreen": [50, 205, 50],
-	"linen": [250, 240, 230],
-	"magenta": [255, 0, 255],
-	"maroon": [128, 0, 0],
-	"mediumaquamarine": [102, 205, 170],
-	"mediumblue": [0, 0, 205],
-	"mediumorchid": [186, 85, 211],
-	"mediumpurple": [147, 112, 219],
-	"mediumseagreen": [60, 179, 113],
-	"mediumslateblue": [123, 104, 238],
-	"mediumspringgreen": [0, 250, 154],
-	"mediumturquoise": [72, 209, 204],
-	"mediumvioletred": [199, 21, 133],
-	"midnightblue": [25, 25, 112],
-	"mintcream": [245, 255, 250],
-	"mistyrose": [255, 228, 225],
-	"moccasin": [255, 228, 181],
-	"navajowhite": [255, 222, 173],
-	"navy": [0, 0, 128],
-	"oldlace": [253, 245, 230],
-	"olive": [128, 128, 0],
-	"olivedrab": [107, 142, 35],
-	"orange": [255, 165, 0],
-	"orangered": [255, 69, 0],
-	"orchid": [218, 112, 214],
-	"palegoldenrod": [238, 232, 170],
-	"palegreen": [152, 251, 152],
-	"paleturquoise": [175, 238, 238],
-	"palevioletred": [219, 112, 147],
-	"papayawhip": [255, 239, 213],
-	"peachpuff": [255, 218, 185],
-	"peru": [205, 133, 63],
-	"pink": [255, 192, 203],
-	"plum": [221, 160, 221],
-	"powderblue": [176, 224, 230],
-	"purple": [128, 0, 128],
-	"rebeccapurple": [102, 51, 153],
-	"red": [255, 0, 0],
-	"rosybrown": [188, 143, 143],
-	"royalblue": [65, 105, 225],
-	"saddlebrown": [139, 69, 19],
-	"salmon": [250, 128, 114],
-	"sandybrown": [244, 164, 96],
-	"seagreen": [46, 139, 87],
-	"seashell": [255, 245, 238],
-	"sienna": [160, 82, 45],
-	"silver": [192, 192, 192],
-	"skyblue": [135, 206, 235],
-	"slateblue": [106, 90, 205],
-	"slategray": [112, 128, 144],
-	"slategrey": [112, 128, 144],
-	"snow": [255, 250, 250],
-	"springgreen": [0, 255, 127],
-	"steelblue": [70, 130, 180],
-	"tan": [210, 180, 140],
-	"teal": [0, 128, 128],
-	"thistle": [216, 191, 216],
-	"tomato": [255, 99, 71],
-	"turquoise": [64, 224, 208],
-	"violet": [238, 130, 238],
-	"wheat": [245, 222, 179],
-	"white": [255, 255, 255],
-	"whitesmoke": [245, 245, 245],
-	"yellow": [255, 255, 0],
-	"yellowgreen": [154, 205, 50]
-};
-
-var index$2 = /*@__PURE__*/getDefaultExportFromCjs(colorName);
-
-var simpleSwizzle$1 = {exports: {}};
-
-var isArrayish$1 = function isArrayish(obj) {
-	if (!obj || typeof obj === 'string') {
-		return false;
-	}
-
-	return obj instanceof Array || Array.isArray(obj) ||
-		(obj.length >= 0 && (obj.splice instanceof Function ||
-			(Object.getOwnPropertyDescriptor(obj, (obj.length - 1)) && obj.constructor.name !== 'String')));
-};
-
-var index$1 = /*@__PURE__*/getDefaultExportFromCjs(isArrayish$1);
-
-var simpleSwizzle = simpleSwizzle$1.exports;
-
-'use strict';
-
-var isArrayish = isArrayish$1;
-
-var concat = Array.prototype.concat;
-var slice = Array.prototype.slice;
-
-var swizzle$1 = simpleSwizzle$1.exports = function swizzle(args) {
-	var results = [];
-
-	for (var i = 0, len = args.length; i < len; i++) {
-		var arg = args[i];
-
-		if (isArrayish(arg)) {
-			// http://jsperf.com/javascript-array-concat-vs-push/98
-			results = concat.call(results, slice.call(arg));
-		} else {
-			results.push(arg);
-		}
-	}
-
-	return results;
-};
-
-swizzle$1.wrap = function (fn) {
-	return function () {
-		return fn(swizzle$1(arguments));
-	};
-};
-
-var simpleSwizzleExports = simpleSwizzle$1.exports;
-var index = /*@__PURE__*/getDefaultExportFromCjs(simpleSwizzleExports);
-
-/* MIT license */
-var colorString = colorString$2.exports;
-
-var colorNames = colorName;
-var swizzle = simpleSwizzleExports;
-var hasOwnProperty = Object.hasOwnProperty;
-
-var reverseNames = Object.create(null);
-
-// create a list of reverse color names
-for (var name in colorNames) {
-	if (hasOwnProperty.call(colorNames, name)) {
-		reverseNames[colorNames[name]] = name;
-	}
-}
-
-var cs = colorString$2.exports = {
-	to: {},
-	get: {}
-};
-
-cs.get = function (string) {
-	var prefix = string.substring(0, 3).toLowerCase();
-	var val;
-	var model;
-	switch (prefix) {
-		case 'hsl':
-			val = cs.get.hsl(string);
-			model = 'hsl';
-			break;
-		case 'hwb':
-			val = cs.get.hwb(string);
-			model = 'hwb';
-			break;
-		default:
-			val = cs.get.rgb(string);
-			model = 'rgb';
-			break;
-	}
-
-	if (!val) {
-		return null;
-	}
-
-	return {model: model, value: val};
-};
-
-cs.get.rgb = function (string) {
-	if (!string) {
-		return null;
-	}
-
-	var abbr = /^#([a-f0-9]{3,4})$/i;
-	var hex = /^#([a-f0-9]{6})([a-f0-9]{2})?$/i;
-	var rgba = /^rgba?\(\s*([+-]?\d+)(?=[\s,])\s*(?:,\s*)?([+-]?\d+)(?=[\s,])\s*(?:,\s*)?([+-]?\d+)\s*(?:[,|\/]\s*([+-]?[\d\.]+)(%?)\s*)?\)$/;
-	var per = /^rgba?\(\s*([+-]?[\d\.]+)\%\s*,?\s*([+-]?[\d\.]+)\%\s*,?\s*([+-]?[\d\.]+)\%\s*(?:[,|\/]\s*([+-]?[\d\.]+)(%?)\s*)?\)$/;
-	var keyword = /^(\w+)$/;
-
-	var rgb = [0, 0, 0, 1];
-	var match;
-	var i;
-	var hexAlpha;
-
-	if (match = string.match(hex)) {
-		hexAlpha = match[2];
-		match = match[1];
-
-		for (i = 0; i < 3; i++) {
-			// https://jsperf.com/slice-vs-substr-vs-substring-methods-long-string/19
-			var i2 = i * 2;
-			rgb[i] = parseInt(match.slice(i2, i2 + 2), 16);
-		}
-
-		if (hexAlpha) {
-			rgb[3] = parseInt(hexAlpha, 16) / 255;
-		}
-	} else if (match = string.match(abbr)) {
-		match = match[1];
-		hexAlpha = match[3];
-
-		for (i = 0; i < 3; i++) {
-			rgb[i] = parseInt(match[i] + match[i], 16);
-		}
-
-		if (hexAlpha) {
-			rgb[3] = parseInt(hexAlpha + hexAlpha, 16) / 255;
-		}
-	} else if (match = string.match(rgba)) {
-		for (i = 0; i < 3; i++) {
-			rgb[i] = parseInt(match[i + 1], 0);
-		}
-
-		if (match[4]) {
-			if (match[5]) {
-				rgb[3] = parseFloat(match[4]) * 0.01;
-			} else {
-				rgb[3] = parseFloat(match[4]);
-			}
-		}
-	} else if (match = string.match(per)) {
-		for (i = 0; i < 3; i++) {
-			rgb[i] = Math.round(parseFloat(match[i + 1]) * 2.55);
-		}
-
-		if (match[4]) {
-			if (match[5]) {
-				rgb[3] = parseFloat(match[4]) * 0.01;
-			} else {
-				rgb[3] = parseFloat(match[4]);
-			}
-		}
-	} else if (match = string.match(keyword)) {
-		if (match[1] === 'transparent') {
-			return [0, 0, 0, 0];
-		}
-
-		if (!hasOwnProperty.call(colorNames, match[1])) {
-			return null;
-		}
-
-		rgb = colorNames[match[1]];
-		rgb[3] = 1;
-
-		return rgb;
-	} else {
-		return null;
-	}
-
-	for (i = 0; i < 3; i++) {
-		rgb[i] = clamp(rgb[i], 0, 255);
-	}
-	rgb[3] = clamp(rgb[3], 0, 1);
-
-	return rgb;
-};
-
-cs.get.hsl = function (string) {
-	if (!string) {
-		return null;
-	}
-
-	var hsl = /^hsla?\(\s*([+-]?(?:\d{0,3}\.)?\d+)(?:deg)?\s*,?\s*([+-]?[\d\.]+)%\s*,?\s*([+-]?[\d\.]+)%\s*(?:[,|\/]\s*([+-]?(?=\.\d|\d)(?:0|[1-9]\d*)?(?:\.\d*)?(?:[eE][+-]?\d+)?)\s*)?\)$/;
-	var match = string.match(hsl);
-
-	if (match) {
-		var alpha = parseFloat(match[4]);
-		var h = ((parseFloat(match[1]) % 360) + 360) % 360;
-		var s = clamp(parseFloat(match[2]), 0, 100);
-		var l = clamp(parseFloat(match[3]), 0, 100);
-		var a = clamp(isNaN(alpha) ? 1 : alpha, 0, 1);
-
-		return [h, s, l, a];
-	}
-
-	return null;
-};
-
-cs.get.hwb = function (string) {
-	if (!string) {
-		return null;
-	}
-
-	var hwb = /^hwb\(\s*([+-]?\d{0,3}(?:\.\d+)?)(?:deg)?\s*,\s*([+-]?[\d\.]+)%\s*,\s*([+-]?[\d\.]+)%\s*(?:,\s*([+-]?(?=\.\d|\d)(?:0|[1-9]\d*)?(?:\.\d*)?(?:[eE][+-]?\d+)?)\s*)?\)$/;
-	var match = string.match(hwb);
-
-	if (match) {
-		var alpha = parseFloat(match[4]);
-		var h = ((parseFloat(match[1]) % 360) + 360) % 360;
-		var w = clamp(parseFloat(match[2]), 0, 100);
-		var b = clamp(parseFloat(match[3]), 0, 100);
-		var a = clamp(isNaN(alpha) ? 1 : alpha, 0, 1);
-		return [h, w, b, a];
-	}
-
-	return null;
-};
-
-cs.to.hex = function () {
-	var rgba = swizzle(arguments);
-
-	return (
-		'#' +
-		hexDouble(rgba[0]) +
-		hexDouble(rgba[1]) +
-		hexDouble(rgba[2]) +
-		(rgba[3] < 1
-			? (hexDouble(Math.round(rgba[3] * 255)))
-			: '')
-	);
-};
-
-cs.to.rgb = function () {
-	var rgba = swizzle(arguments);
-
-	return rgba.length < 4 || rgba[3] === 1
-		? 'rgb(' + Math.round(rgba[0]) + ', ' + Math.round(rgba[1]) + ', ' + Math.round(rgba[2]) + ')'
-		: 'rgba(' + Math.round(rgba[0]) + ', ' + Math.round(rgba[1]) + ', ' + Math.round(rgba[2]) + ', ' + rgba[3] + ')';
-};
-
-cs.to.rgb.percent = function () {
-	var rgba = swizzle(arguments);
-
-	var r = Math.round(rgba[0] / 255 * 100);
-	var g = Math.round(rgba[1] / 255 * 100);
-	var b = Math.round(rgba[2] / 255 * 100);
-
-	return rgba.length < 4 || rgba[3] === 1
-		? 'rgb(' + r + '%, ' + g + '%, ' + b + '%)'
-		: 'rgba(' + r + '%, ' + g + '%, ' + b + '%, ' + rgba[3] + ')';
-};
-
-cs.to.hsl = function () {
-	var hsla = swizzle(arguments);
-	return hsla.length < 4 || hsla[3] === 1
-		? 'hsl(' + hsla[0] + ', ' + hsla[1] + '%, ' + hsla[2] + '%)'
-		: 'hsla(' + hsla[0] + ', ' + hsla[1] + '%, ' + hsla[2] + '%, ' + hsla[3] + ')';
-};
-
-// hwb is a bit different than rgb(a) & hsl(a) since there is no alpha specific syntax
-// (hwb have alpha optional & 1 is default value)
-cs.to.hwb = function () {
-	var hwba = swizzle(arguments);
-
-	var a = '';
-	if (hwba.length >= 4 && hwba[3] !== 1) {
-		a = ', ' + hwba[3];
-	}
-
-	return 'hwb(' + hwba[0] + ', ' + hwba[1] + '%, ' + hwba[2] + '%' + a + ')';
-};
-
-cs.to.keyword = function (rgb) {
-	return reverseNames[rgb.slice(0, 3)];
-};
-
-// helpers
-function clamp(num, min, max) {
-	return Math.min(Math.max(min, num), max);
-}
-
-function hexDouble(num) {
-	var str = Math.round(num).toString(16).toUpperCase();
-	return (str.length < 2) ? '0' + str : str;
-}
-
-var colorStringExports = colorString$2.exports;
-var colorString$1 = /*@__PURE__*/getDefaultExportFromCjs(colorStringExports);
 
 var $version = 8;
 var $root = {
@@ -5552,6 +5109,310 @@ function hslToRgb([h, s, l, alpha]) {
 }
 
 /**
+ * CSS color parser compliant with CSS Color 4 Specification.
+ * Supports: named colors, `transparent` keyword, all rgb hex notations,
+ * rgb(), rgba(), hsl() and hsla() functions.
+ * Does not round the parsed values to integers from the range 0..255.
+ *
+ * Syntax:
+ *
+ * <alpha-value> = <number> | <percentage>
+ *         <hue> = <number> | <angle>
+ *
+ *         rgb() = rgb( <percentage>{3} [ / <alpha-value> ]? ) | rgb( <number>{3} [ / <alpha-value> ]? )
+ *         rgb() = rgb( <percentage>#{3} , <alpha-value>? )    | rgb( <number>#{3} , <alpha-value>? )
+ *
+ *         hsl() = hsl( <hue> <percentage> <percentage> [ / <alpha-value> ]? )
+ *         hsl() = hsl( <hue>, <percentage>, <percentage>, <alpha-value>? )
+ *
+ * Caveats:
+ *   - <angle> - <number> with optional `deg` suffix; `grad`, `rad`, `turn` are not supported
+ *   - `none` keyword is not supported
+ *   - comments inside rgb()/hsl() are not supported
+ *   - legacy color syntax rgba() is supported with an identical grammar and behavior to rgb()
+ *   - legacy color syntax hsla() is supported with an identical grammar and behavior to hsl()
+ *
+ * @param input CSS color string to parse.
+ * @returns Color in sRGB color space, with `red`, `green`, `blue`
+ * and `alpha` channels normalized to the range 0..1,
+ * or `undefined` if the input is not a valid color string.
+ */
+function parseCssColor(input) {
+    input = input.toLowerCase();
+    if (input === 'transparent') {
+        return [0, 0, 0, 0];
+    }
+    // 'white', 'black', 'blue'
+    const namedColorsMatch = namedColors[input];
+    if (namedColorsMatch) {
+        const [r, g, b] = namedColorsMatch;
+        return [r / 255, g / 255, b / 255, 1];
+    }
+    // #f0c, #f0cf, #ff00cc, #ff00ccff
+    const hexRegexp = /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/;
+    if (hexRegexp.test(input)) {
+        const step = input.length < 6 ? 1 : 2;
+        let i = 1;
+        return [
+            parseHex(input.slice(i, i += step)),
+            parseHex(input.slice(i, i += step)),
+            parseHex(input.slice(i, i += step)),
+            parseHex(input.slice(i, i + step) || 'ff'),
+        ];
+    }
+    // rgb(128 0 0), rgb(50% 0% 0%), rgba(255,0,255,0.6), rgb(255 0 255 / 60%), rgb(100% 0% 100% /.6)
+    const rgbRegExp = /^rgba?\(\s*([\de.+-]+)(%)?(?:\s+|\s*(,)\s*)([\de.+-]+)(%)?(?:\s+|\s*(,)\s*)([\de.+-]+)(%)?(?:\s*([,\/])\s*([\de.+-]+)(%)?)?\s*\)$/;
+    const rgbMatch = input.match(rgbRegExp);
+    if (rgbMatch) {
+        const [_, // eslint-disable-line @typescript-eslint/no-unused-vars
+        r, // <numeric>
+        rp, // %         (optional)
+        f1, // ,         (optional)
+        g, // <numeric>
+        gp, // %         (optional)
+        f2, // ,         (optional)
+        b, // <numeric>
+        bp, // %         (optional)
+        f3, // ,|/       (optional)
+        a, // <numeric> (optional)
+        ap, // %         (optional)
+        ] = rgbMatch;
+        const argFormat = [f1 || ' ', f2 || ' ', f3].join('');
+        if (argFormat === '  ' ||
+            argFormat === '  /' ||
+            argFormat === ',,' ||
+            argFormat === ',,,') {
+            const valFormat = [rp, gp, bp].join('');
+            const maxValue = (valFormat === '%%%') ? 100 :
+                (valFormat === '') ? 255 : 0;
+            if (maxValue) {
+                const rgba = [
+                    clamp(+r / maxValue, 0, 1),
+                    clamp(+g / maxValue, 0, 1),
+                    clamp(+b / maxValue, 0, 1),
+                    a ? parseAlpha(+a, ap) : 1,
+                ];
+                if (validateNumbers(rgba)) {
+                    return rgba;
+                }
+                // invalid numbers
+            }
+            // values must be all numbers or all percentages
+        }
+        return; // comma optional syntax requires no commas at all
+    }
+    // hsl(120 50% 80%), hsla(120deg,50%,80%,.9), hsl(12e1 50% 80% / 90%)
+    const hslRegExp = /^hsla?\(\s*([\de.+-]+)(?:deg)?(?:\s+|\s*(,)\s*)([\de.+-]+)%(?:\s+|\s*(,)\s*)([\de.+-]+)%(?:\s*([,\/])\s*([\de.+-]+)(%)?)?\s*\)$/;
+    const hslMatch = input.match(hslRegExp);
+    if (hslMatch) {
+        const [_, // eslint-disable-line @typescript-eslint/no-unused-vars
+        h, // <numeric>
+        f1, // ,         (optional)
+        s, // <numeric>
+        f2, // ,         (optional)
+        l, // <numeric>
+        f3, // ,|/       (optional)
+        a, // <numeric> (optional)
+        ap, // %         (optional)
+        ] = hslMatch;
+        const argFormat = [f1 || ' ', f2 || ' ', f3].join('');
+        if (argFormat === '  ' ||
+            argFormat === '  /' ||
+            argFormat === ',,' ||
+            argFormat === ',,,') {
+            const hsla = [
+                +h,
+                clamp(+s, 0, 100),
+                clamp(+l, 0, 100),
+                a ? parseAlpha(+a, ap) : 1,
+            ];
+            if (validateNumbers(hsla)) {
+                return hslToRgb(hsla);
+            }
+            // invalid numbers
+        }
+        // comma optional syntax requires no commas at all
+    }
+}
+function parseHex(hex) {
+    return parseInt(hex.padEnd(2, hex), 16) / 255;
+}
+function parseAlpha(a, asPercentage) {
+    return clamp(asPercentage ? (a / 100) : a, 0, 1);
+}
+function clamp(n, min, max) {
+    return Math.min(Math.max(min, n), max);
+}
+/**
+ * The regular expression for numeric values is not super specific, and it may
+ * happen that it will accept a value that is not a valid number. In order to
+ * detect and eliminate such values this function exists.
+ *
+ * @param array Array of uncertain numbers.
+ * @returns `true` if the specified array contains only valid numbers, `false` otherwise.
+ */
+function validateNumbers(array) {
+    return !array.some(Number.isNaN);
+}
+/**
+ * To generate:
+ * - visit {@link https://www.w3.org/TR/css-color-4/#named-colors}
+ * - run in the console:
+ * @example
+ * copy(`{\n${[...document.querySelector('.named-color-table tbody').children].map((tr) => `${tr.cells[2].textContent.trim()}: [${tr.cells[4].textContent.trim().split(/\s+/).join(', ')}],`).join('\n')}\n}`);
+ */
+const namedColors = {
+    aliceblue: [240, 248, 255],
+    antiquewhite: [250, 235, 215],
+    aqua: [0, 255, 255],
+    aquamarine: [127, 255, 212],
+    azure: [240, 255, 255],
+    beige: [245, 245, 220],
+    bisque: [255, 228, 196],
+    black: [0, 0, 0],
+    blanchedalmond: [255, 235, 205],
+    blue: [0, 0, 255],
+    blueviolet: [138, 43, 226],
+    brown: [165, 42, 42],
+    burlywood: [222, 184, 135],
+    cadetblue: [95, 158, 160],
+    chartreuse: [127, 255, 0],
+    chocolate: [210, 105, 30],
+    coral: [255, 127, 80],
+    cornflowerblue: [100, 149, 237],
+    cornsilk: [255, 248, 220],
+    crimson: [220, 20, 60],
+    cyan: [0, 255, 255],
+    darkblue: [0, 0, 139],
+    darkcyan: [0, 139, 139],
+    darkgoldenrod: [184, 134, 11],
+    darkgray: [169, 169, 169],
+    darkgreen: [0, 100, 0],
+    darkgrey: [169, 169, 169],
+    darkkhaki: [189, 183, 107],
+    darkmagenta: [139, 0, 139],
+    darkolivegreen: [85, 107, 47],
+    darkorange: [255, 140, 0],
+    darkorchid: [153, 50, 204],
+    darkred: [139, 0, 0],
+    darksalmon: [233, 150, 122],
+    darkseagreen: [143, 188, 143],
+    darkslateblue: [72, 61, 139],
+    darkslategray: [47, 79, 79],
+    darkslategrey: [47, 79, 79],
+    darkturquoise: [0, 206, 209],
+    darkviolet: [148, 0, 211],
+    deeppink: [255, 20, 147],
+    deepskyblue: [0, 191, 255],
+    dimgray: [105, 105, 105],
+    dimgrey: [105, 105, 105],
+    dodgerblue: [30, 144, 255],
+    firebrick: [178, 34, 34],
+    floralwhite: [255, 250, 240],
+    forestgreen: [34, 139, 34],
+    fuchsia: [255, 0, 255],
+    gainsboro: [220, 220, 220],
+    ghostwhite: [248, 248, 255],
+    gold: [255, 215, 0],
+    goldenrod: [218, 165, 32],
+    gray: [128, 128, 128],
+    green: [0, 128, 0],
+    greenyellow: [173, 255, 47],
+    grey: [128, 128, 128],
+    honeydew: [240, 255, 240],
+    hotpink: [255, 105, 180],
+    indianred: [205, 92, 92],
+    indigo: [75, 0, 130],
+    ivory: [255, 255, 240],
+    khaki: [240, 230, 140],
+    lavender: [230, 230, 250],
+    lavenderblush: [255, 240, 245],
+    lawngreen: [124, 252, 0],
+    lemonchiffon: [255, 250, 205],
+    lightblue: [173, 216, 230],
+    lightcoral: [240, 128, 128],
+    lightcyan: [224, 255, 255],
+    lightgoldenrodyellow: [250, 250, 210],
+    lightgray: [211, 211, 211],
+    lightgreen: [144, 238, 144],
+    lightgrey: [211, 211, 211],
+    lightpink: [255, 182, 193],
+    lightsalmon: [255, 160, 122],
+    lightseagreen: [32, 178, 170],
+    lightskyblue: [135, 206, 250],
+    lightslategray: [119, 136, 153],
+    lightslategrey: [119, 136, 153],
+    lightsteelblue: [176, 196, 222],
+    lightyellow: [255, 255, 224],
+    lime: [0, 255, 0],
+    limegreen: [50, 205, 50],
+    linen: [250, 240, 230],
+    magenta: [255, 0, 255],
+    maroon: [128, 0, 0],
+    mediumaquamarine: [102, 205, 170],
+    mediumblue: [0, 0, 205],
+    mediumorchid: [186, 85, 211],
+    mediumpurple: [147, 112, 219],
+    mediumseagreen: [60, 179, 113],
+    mediumslateblue: [123, 104, 238],
+    mediumspringgreen: [0, 250, 154],
+    mediumturquoise: [72, 209, 204],
+    mediumvioletred: [199, 21, 133],
+    midnightblue: [25, 25, 112],
+    mintcream: [245, 255, 250],
+    mistyrose: [255, 228, 225],
+    moccasin: [255, 228, 181],
+    navajowhite: [255, 222, 173],
+    navy: [0, 0, 128],
+    oldlace: [253, 245, 230],
+    olive: [128, 128, 0],
+    olivedrab: [107, 142, 35],
+    orange: [255, 165, 0],
+    orangered: [255, 69, 0],
+    orchid: [218, 112, 214],
+    palegoldenrod: [238, 232, 170],
+    palegreen: [152, 251, 152],
+    paleturquoise: [175, 238, 238],
+    palevioletred: [219, 112, 147],
+    papayawhip: [255, 239, 213],
+    peachpuff: [255, 218, 185],
+    peru: [205, 133, 63],
+    pink: [255, 192, 203],
+    plum: [221, 160, 221],
+    powderblue: [176, 224, 230],
+    purple: [128, 0, 128],
+    rebeccapurple: [102, 51, 153],
+    red: [255, 0, 0],
+    rosybrown: [188, 143, 143],
+    royalblue: [65, 105, 225],
+    saddlebrown: [139, 69, 19],
+    salmon: [250, 128, 114],
+    sandybrown: [244, 164, 96],
+    seagreen: [46, 139, 87],
+    seashell: [255, 245, 238],
+    sienna: [160, 82, 45],
+    silver: [192, 192, 192],
+    skyblue: [135, 206, 235],
+    slateblue: [106, 90, 205],
+    slategray: [112, 128, 144],
+    slategrey: [112, 128, 144],
+    snow: [255, 250, 250],
+    springgreen: [0, 255, 127],
+    steelblue: [70, 130, 180],
+    tan: [210, 180, 140],
+    teal: [0, 128, 128],
+    thistle: [216, 191, 216],
+    tomato: [255, 99, 71],
+    turquoise: [64, 224, 208],
+    violet: [238, 130, 238],
+    wheat: [245, 222, 179],
+    white: [255, 255, 255],
+    whitesmoke: [245, 245, 245],
+    yellow: [255, 255, 0],
+    yellowgreen: [154, 205, 50],
+};
+
+/**
  * Color representation used by WebGL.
  * Defined in sRGB color space and pre-blended with alpha.
  * @private
@@ -5602,7 +5463,7 @@ class Color {
         if (typeof input !== 'string') {
             return;
         }
-        const rgba = parseCssColor(input.toLowerCase());
+        const rgba = parseCssColor(input);
         if (rgba) {
             return new Color(...rgba, false);
         }
@@ -5671,18 +5532,6 @@ class Color {
     toString() {
         const [r, g, b, a] = this.rgb;
         return `rgba(${[r, g, b].map(n => Math.round(n * 255)).join(',')},${a})`;
-    }
-}
-function parseCssColor(colorToParse) {
-    const parsingResult = colorString$1.get(colorToParse);
-    switch (parsingResult === null || parsingResult === void 0 ? void 0 : parsingResult.model) {
-        case 'rgb': {
-            const [r, g, b, alpha] = parsingResult.value;
-            return [r / 255, g / 255, b / 255, alpha];
-        }
-        case 'hsl': {
-            return hslToRgb(parsingResult.value);
-        }
     }
 }
 Color.black = new Color(0, 0, 0, 1);
@@ -25425,6 +25274,7 @@ class LineBucket {
         // to `linesofar`.
         if (this.distance > MAX_LINE_DISTANCE / 2 && this.totalDistance === 0) {
             this.distance = 0;
+            this.updateScaledDistance();
             this.addCurrentVertex(p, normal, endLeft, endRight, segment, round);
         }
     }
@@ -33970,7 +33820,7 @@ define(['./shared'], (function (performance) { 'use strict';
 
 var name = "maplibre-gl";
 var description = "BSD licensed community fork of mapbox-gl, a WebGL interactive maps library";
-var version$2 = "3.0.0-pre.7";
+var version$2 = "3.0.0";
 var main = "dist/maplibre-gl.js";
 var style = "dist/maplibre-gl.css";
 var license = "BSD-3-Clause";
@@ -33989,7 +33839,7 @@ var dependencies = {
 	"@mapbox/unitbezier": "^0.0.1",
 	"@mapbox/vector-tile": "^1.3.1",
 	"@mapbox/whoots-js": "^3.1.0",
-	"@maplibre/maplibre-gl-style-spec": "^19.1.0",
+	"@maplibre/maplibre-gl-style-spec": "^19.2.0",
 	"@types/geojson": "^7946.0.10",
 	"@types/mapbox__point-geometry": "^0.1.2",
 	"@types/mapbox__vector-tile": "^1.3.0",
@@ -34010,13 +33860,13 @@ var dependencies = {
 var devDependencies = {
 	"@mapbox/mapbox-gl-rtl-text": "^0.2.3",
 	"@mapbox/mvt-fixtures": "^3.10.0",
-	"@rollup/plugin-commonjs": "^24.1.0",
+	"@rollup/plugin-commonjs": "^25.0.0",
 	"@rollup/plugin-json": "^6.0.0",
 	"@rollup/plugin-node-resolve": "^15.0.2",
 	"@rollup/plugin-replace": "^5.0.2",
 	"@rollup/plugin-strip": "^3.0.2",
 	"@rollup/plugin-terser": "^0.4.1",
-	"@rollup/plugin-typescript": "^11.1.0",
+	"@rollup/plugin-typescript": "^11.1.1",
 	"@types/benchmark": "^2.1.2",
 	"@types/cssnano": "^5.0.0",
 	"@types/d3": "^7.4.0",
@@ -34040,15 +33890,15 @@ var devDependencies = {
 	"@types/shuffle-seed": "^1.1.0",
 	"@types/supercluster": "^7.1.0",
 	"@types/window-or-global": "^1.0.4",
-	"@typescript-eslint/eslint-plugin": "^5.59.0",
-	"@typescript-eslint/parser": "^5.59.2",
+	"@typescript-eslint/eslint-plugin": "^5.59.6",
+	"@typescript-eslint/parser": "^5.59.5",
 	address: "^1.2.2",
 	benchmark: "^2.1.4",
 	canvas: "^2.11.2",
 	cssnano: "^6.0.1",
 	d3: "^7.8.4",
 	"d3-queue": "^3.0.7",
-	"devtools-protocol": "^0.0.1120988",
+	"devtools-protocol": "^0.0.1144541",
 	diff: "^5.1.0",
 	documentation: "14.0.1",
 	"dts-bundle-generator": "^8.0.1",
@@ -34057,11 +33907,11 @@ var devDependencies = {
 	"eslint-plugin-html": "^7.1.0",
 	"eslint-plugin-import": "^2.27.5",
 	"eslint-plugin-jest": "^27.2.1",
-	"eslint-plugin-jsdoc": "^44.0.0",
+	"eslint-plugin-jsdoc": "^44.2.3",
 	"eslint-plugin-react": "^7.32.2",
 	expect: "^29.5.0",
 	gl: "^6.0.2",
-	glob: "^10.2.2",
+	glob: "^10.2.4",
 	"is-builtin-module": "^3.2.1",
 	jest: "^29.5.0",
 	"jest-canvas-mock": "^2.5.0",
@@ -34081,13 +33931,13 @@ var devDependencies = {
 	"postcss-cli": "^10.1.0",
 	"postcss-inline-svg": "^6.0.0",
 	"pretty-bytes": "^6.1.0",
-	puppeteer: "^20.1.1",
+	puppeteer: "^20.2.0",
 	react: "^18.2.0",
 	"react-dom": "^18.2.0",
 	rollup: "^3.21.5",
 	"rollup-plugin-sourcemaps": "^0.6.3",
 	rw: "^1.3.3",
-	semver: "^7.5.0",
+	semver: "^7.5.1",
 	"shuffle-seed": "^1.1.6",
 	"source-map-explorer": "^2.5.3",
 	st: "^3.0.0",
@@ -34137,10 +33987,10 @@ var scripts = {
 	"test-render": "ts-node test/integration/render/run_render_tests.ts",
 	"test-unit": "jest --selectProjects=unit",
 	"test-watch-roots": "jest --watch",
-	codegen: "npm run generate-style-code && npm run generate-struct-arrays && npm run generate-shaders",
+	codegen: "run-p generate-dist-package generate-style-code generate-struct-arrays generate-shaders",
 	benchmark: "ts-node test/bench/run-benchmarks.ts",
 	"gl-stats": "ts-node test/bench/gl-stats.ts",
-	prepare: "npm run generate-dist-package && npm run codegen",
+	prepare: "npm run codegen",
 	typecheck: "tsc --noEmit"
 };
 var files = [
@@ -34367,6 +34217,8 @@ var ImageRequest;
      */
     ImageRequest.removeThrottleControl = (callbackHandle) => {
         delete throttleControlCallbacks[callbackHandle];
+        // Try updating the queue
+        processQueue();
     };
     /**
      * Check to see if any of the installed callbacks are requesting the queue
@@ -34400,20 +34252,28 @@ var ImageRequest;
             }
             requestParameters.headers.accept = 'image/webp,*/*';
         }
-        const queued = {
+        const request = {
             requestParameters,
             supportImageRefresh,
             callback,
             cancelled: false,
             completed: false,
-            // Just a place holder. The real one will be assigned during processQueue()
-            cancel: () => { }
+            cancel: () => {
+                if (!request.completed && !request.cancelled) {
+                    request.cancelled = true;
+                    // Only reduce currentParallelImageRequests, if the image request was issued.
+                    if (request.innerRequest) {
+                        request.innerRequest.cancel();
+                        currentParallelImageRequests--;
+                    }
+                    // in the case of cancelling, it WILL move on
+                    processQueue();
+                }
+            }
         };
-        imageRequestQueue.push(queued);
-        if (!isThrottled()) {
-            ImageRequest.processQueue();
-        }
-        return queued;
+        imageRequestQueue.push(request);
+        processQueue();
+        return request;
     };
     const arrayBufferToCanvasImageSource = (data, callback) => {
         const imageBitmapSupported = typeof createImageBitmap === 'function';
@@ -34469,41 +34329,27 @@ var ImageRequest;
         if (!itemInQueue.cancelled) {
             itemInQueue.completed = true;
             currentParallelImageRequests--;
-            if (!isThrottled()) {
-                ImageRequest.processQueue();
-            }
+            processQueue();
         }
     };
     /**
      * Process some number of items in the image request queue.
-     * @param {number} maxImageRequests The maximum number of request items to process. By default, up to {@link Config.MAX_PARALLEL_IMAGE_REQUESTS} will be processed.
-     * @returns {number} The number of items remaining in the queue.
      */
-    ImageRequest.processQueue = (maxImageRequests = 0) => {
-        if (maxImageRequests <= 0) {
-            maxImageRequests = isThrottled() ? performance.config.MAX_PARALLEL_IMAGE_REQUESTS_PER_FRAME : performance.config.MAX_PARALLEL_IMAGE_REQUESTS;
-        }
-        const cancelRequest = (request) => {
-            if (!request.completed && !request.cancelled) {
-                currentParallelImageRequests--;
-                request.cancelled = true;
-                request.innerRequest.cancel();
-                // in the case of cancelling, it WILL move on
-                ImageRequest.processQueue();
-            }
-        };
+    const processQueue = () => {
+        const maxImageRequests = isThrottled() ?
+            performance.config.MAX_PARALLEL_IMAGE_REQUESTS_PER_FRAME :
+            performance.config.MAX_PARALLEL_IMAGE_REQUESTS;
         // limit concurrent image loads to help with raster sources performance on big screens
         for (let numImageRequests = currentParallelImageRequests; numImageRequests < maxImageRequests && imageRequestQueue.length > 0; numImageRequests++) {
             const topItemInQueue = imageRequestQueue.shift();
             if (topItemInQueue.cancelled) {
+                numImageRequests--;
                 continue;
             }
             const innerRequest = doImageRequest(topItemInQueue);
             currentParallelImageRequests++;
             topItemInQueue.innerRequest = innerRequest;
-            topItemInQueue.cancel = () => cancelRequest(topItemInQueue);
         }
-        return imageRequestQueue.length;
     };
     const getImageUsingHtmlImage = (requestParameters, callback) => {
         const image = new Image();
@@ -36859,12 +36705,17 @@ class ImageSource extends performance.Evented {
             this.texture = new Texture(context, this.image, gl.RGBA);
             this.texture.bind(gl.LINEAR, gl.CLAMP_TO_EDGE);
         }
+        let newTilesLoaded = false;
         for (const w in this.tiles) {
             const tile = this.tiles[w];
             if (tile.state !== 'loaded') {
                 tile.state = 'loaded';
                 tile.texture = this.texture;
+                newTilesLoaded = true;
             }
+        }
+        if (newTilesLoaded) {
+            this.fire(new performance.Event('data', { dataType: 'source', sourceDataType: 'idle', sourceId: this.id }));
         }
     }
     loadTile(tile, callback) {
@@ -37066,12 +36917,17 @@ class VideoSource extends ImageSource {
             this.texture.bind(gl.LINEAR, gl.CLAMP_TO_EDGE);
             gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.video);
         }
+        let newTilesLoaded = false;
         for (const w in this.tiles) {
             const tile = this.tiles[w];
             if (tile.state !== 'loaded') {
                 tile.state = 'loaded';
                 tile.texture = this.texture;
+                newTilesLoaded = true;
             }
+        }
+        if (newTilesLoaded) {
+            this.fire(new performance.Event('data', { dataType: 'source', sourceDataType: 'idle', sourceId: this.id }));
         }
     }
     serialize() {
@@ -37248,12 +37104,17 @@ class CanvasSource extends ImageSource {
         else if (resize || this._playing) {
             this.texture.update(this.canvas, { premultiply: true });
         }
+        let newTilesLoaded = false;
         for (const w in this.tiles) {
             const tile = this.tiles[w];
             if (tile.state !== 'loaded') {
                 tile.state = 'loaded';
                 tile.texture = this.texture;
+                newTilesLoaded = true;
             }
+        }
+        if (newTilesLoaded) {
+            this.fire(new performance.Event('data', { dataType: 'source', sourceDataType: 'idle', sourceId: this.id }));
         }
     }
     serialize() {
@@ -37501,6 +37362,8 @@ class Tile {
      * @private
      */
     constructor(tileID, size) {
+        this.timeAdded = 0;
+        this.fadeEndTime = 0;
         this.tileID = tileID;
         this.uid = performance.uniqueId();
         this.uses = 0;
@@ -37522,10 +37385,9 @@ class Tile {
     }
     registerFadeDuration(duration) {
         const fadeEndTime = duration + this.timeAdded;
-        if (fadeEndTime < performance.exported.now())
+        if (fadeEndTime < this.fadeEndTime) {
             return;
-        if (this.fadeEndTime && fadeEndTime < this.fadeEndTime)
-            return;
+        }
         this.fadeEndTime = fadeEndTime;
     }
     wasRequested() {
@@ -38184,6 +38046,7 @@ class SourceCache extends performance.Evented {
                 if (this.transform) {
                     this.update(this.transform, this.terrain);
                 }
+                this._didEmitContent = true;
             }
         });
         this.on('dataloading', () => {
@@ -38202,6 +38065,8 @@ class SourceCache extends performance.Evented {
         this._loadedParentTiles = {};
         this._coveredTiles = {};
         this._state = new SourceFeatureState();
+        this._didEmitContent = false;
+        this._updated = false;
     }
     onAdd(map) {
         this.map = map;
@@ -38229,6 +38094,13 @@ class SourceCache extends performance.Evented {
             return false;
         }
         if (!this._source.loaded()) {
+            return false;
+        }
+        if ((this.used !== undefined || this.usedForTerrain !== undefined) && !this.used && !this.usedForTerrain) {
+            return true;
+        }
+        // do not consider as loaded if the update hasn't been called yet (we do not know if we will have any tiles to fetch)
+        if (!this._updated) {
             return false;
         }
         for (const t in this._tiles) {
@@ -38599,6 +38471,13 @@ class SourceCache extends performance.Evented {
             }
             idealTileIDs = idealTileIDs.concat(Object.values(parents));
         }
+        const noPendingDataEmissions = idealTileIDs.length === 0 && !this._updated && this._didEmitContent;
+        this._updated = true;
+        // if we won't have any tiles to fetch and content is already emitted
+        // there will be no more data emissions, so we need to emit the event with isSourceLoaded = true
+        if (noPendingDataEmissions) {
+            this.fire(new performance.Event('data', { sourceDataType: 'idle', dataType: 'source', sourceId: this.id }));
+        }
         // Retain is a list of tiles that we shouldn't delete, even if they are not
         // the most ideal tile for the current viewport. This may include tiles like
         // parent or child tiles that are *already* loaded.
@@ -38607,11 +38486,16 @@ class SourceCache extends performance.Evented {
             const parentsForFading = {};
             const fadingTiles = {};
             const ids = Object.keys(retain);
+            const now = performance.exported.now();
             for (const id of ids) {
                 const tileID = retain[id];
                 const tile = this._tiles[id];
-                if (!tile || tile.fadeEndTime !== undefined && tile.fadeEndTime <= performance.exported.now())
+                // when fadeEndTime is 0, the tile is created but registerFadeDuration
+                // has not been called, therefore must be kept in fadingTiles dictionary
+                // for next round of rendering
+                if (!tile || (tile.fadeEndTime !== 0 && tile.fadeEndTime <= now)) {
                     continue;
+                }
                 // if the tile is loaded but still fading in, find parents to cross-fade with it
                 const parentTile = this.findLoadedParent(tileID, minCoveringZoom);
                 if (parentTile) {
@@ -38945,9 +38829,10 @@ class SourceCache extends performance.Evented {
             return true;
         }
         if (isRasterType(this._source.type)) {
+            const now = performance.exported.now();
             for (const id in this._tiles) {
                 const tile = this._tiles[id];
-                if (tile.fadeEndTime !== undefined && tile.fadeEndTime >= performance.exported.now()) {
+                if (tile.fadeEndTime >= now) {
                     return true;
                 }
             }
@@ -41885,7 +41770,7 @@ class Style extends performance.Evented {
         const sourceCache = this.sourceCaches[id] = new SourceCache(id, source, this.dispatcher);
         sourceCache.style = this;
         sourceCache.setEventedParent(this, () => ({
-            isSourceLoaded: this.loaded(),
+            isSourceLoaded: sourceCache.loaded(),
             source: sourceCache.serialize(),
             sourceId: id
         }));
@@ -42747,13 +42632,13 @@ var fillPatternVert = 'uniform mat4 u_matrix;uniform vec2 u_pixel_coord_upper;un
 var fillExtrusionFrag = 'varying vec4 v_color;void main() {gl_FragColor=v_color;\n#ifdef OVERDRAW_INSPECTOR\ngl_FragColor=vec4(1.0);\n#endif\n}';
 
 // This file is generated. Edit build/generate-shaders.ts, then run `npm run codegen`.
-var fillExtrusionVert = 'uniform mat4 u_matrix;uniform vec3 u_lightcolor;uniform lowp vec3 u_lightpos;uniform lowp float u_lightintensity;uniform float u_vertical_gradient;uniform lowp float u_opacity;attribute vec2 a_pos;attribute vec4 a_normal_ed;\n#ifdef TERRAIN3D\nattribute vec2 a_centroid;\n#endif\nvarying vec4 v_color;\n#pragma mapbox: define highp float base\n#pragma mapbox: define highp float height\n#pragma mapbox: define highp vec4 color\nvoid main() {\n#pragma mapbox: initialize highp float base\n#pragma mapbox: initialize highp float height\n#pragma mapbox: initialize highp vec4 color\nvec3 normal=a_normal_ed.xyz;\n#ifdef TERRAIN3D\nfloat baseDelta=10.0;float ele=get_elevation(a_centroid);\n#else\nfloat baseDelta=0.0;float ele=0.0;\n#endif\nbase=max(0.0,ele+base-baseDelta);height=max(0.0,ele+height);float t=mod(normal.x,2.0);gl_Position=u_matrix*vec4(a_pos,t > 0.0 ? height : base,1);float colorvalue=color.r*0.2126+color.g*0.7152+color.b*0.0722;v_color=vec4(0.0,0.0,0.0,1.0);vec4 ambientlight=vec4(0.03,0.03,0.03,1.0);color+=ambientlight;float directional=clamp(dot(normal/16384.0,u_lightpos),0.0,1.0);directional=mix((1.0-u_lightintensity),max((1.0-colorvalue+u_lightintensity),1.0),directional);if (normal.y !=0.0) {directional*=((1.0-u_vertical_gradient)+(u_vertical_gradient*clamp((t+base)*pow(height/150.0,0.5),mix(0.7,0.98,1.0-u_lightintensity),1.0)));}v_color.r+=clamp(color.r*directional*u_lightcolor.r,mix(0.0,0.3,1.0-u_lightcolor.r),1.0);v_color.g+=clamp(color.g*directional*u_lightcolor.g,mix(0.0,0.3,1.0-u_lightcolor.g),1.0);v_color.b+=clamp(color.b*directional*u_lightcolor.b,mix(0.0,0.3,1.0-u_lightcolor.b),1.0);v_color*=u_opacity;}';
+var fillExtrusionVert = 'uniform mat4 u_matrix;uniform vec3 u_lightcolor;uniform lowp vec3 u_lightpos;uniform lowp float u_lightintensity;uniform float u_vertical_gradient;uniform lowp float u_opacity;attribute vec2 a_pos;attribute vec4 a_normal_ed;\n#ifdef TERRAIN3D\nattribute vec2 a_centroid;\n#endif\nvarying vec4 v_color;\n#pragma mapbox: define highp float base\n#pragma mapbox: define highp float height\n#pragma mapbox: define highp vec4 color\nvoid main() {\n#pragma mapbox: initialize highp float base\n#pragma mapbox: initialize highp float height\n#pragma mapbox: initialize highp vec4 color\nvec3 normal=a_normal_ed.xyz;\n#ifdef TERRAIN3D\nfloat height_terrain3d_offset=get_elevation(a_centroid);float base_terrain3d_offset=height_terrain3d_offset-(base > 0.0 ? 0.0 : 10.0);\n#else\nfloat height_terrain3d_offset=0.0;float base_terrain3d_offset=0.0;\n#endif\nbase=max(0.0,base)+base_terrain3d_offset;height=max(0.0,height)+height_terrain3d_offset;float t=mod(normal.x,2.0);gl_Position=u_matrix*vec4(a_pos,t > 0.0 ? height : base,1);float colorvalue=color.r*0.2126+color.g*0.7152+color.b*0.0722;v_color=vec4(0.0,0.0,0.0,1.0);vec4 ambientlight=vec4(0.03,0.03,0.03,1.0);color+=ambientlight;float directional=clamp(dot(normal/16384.0,u_lightpos),0.0,1.0);directional=mix((1.0-u_lightintensity),max((1.0-colorvalue+u_lightintensity),1.0),directional);if (normal.y !=0.0) {directional*=((1.0-u_vertical_gradient)+(u_vertical_gradient*clamp((t+base)*pow(height/150.0,0.5),mix(0.7,0.98,1.0-u_lightintensity),1.0)));}v_color.r+=clamp(color.r*directional*u_lightcolor.r,mix(0.0,0.3,1.0-u_lightcolor.r),1.0);v_color.g+=clamp(color.g*directional*u_lightcolor.g,mix(0.0,0.3,1.0-u_lightcolor.g),1.0);v_color.b+=clamp(color.b*directional*u_lightcolor.b,mix(0.0,0.3,1.0-u_lightcolor.b),1.0);v_color*=u_opacity;}';
 
 // This file is generated. Edit build/generate-shaders.ts, then run `npm run codegen`.
 var fillExtrusionPatternFrag = 'uniform vec2 u_texsize;uniform float u_fade;uniform sampler2D u_image;varying vec2 v_pos_a;varying vec2 v_pos_b;varying vec4 v_lighting;\n#pragma mapbox: define lowp float base\n#pragma mapbox: define lowp float height\n#pragma mapbox: define lowp vec4 pattern_from\n#pragma mapbox: define lowp vec4 pattern_to\n#pragma mapbox: define lowp float pixel_ratio_from\n#pragma mapbox: define lowp float pixel_ratio_to\nvoid main() {\n#pragma mapbox: initialize lowp float base\n#pragma mapbox: initialize lowp float height\n#pragma mapbox: initialize mediump vec4 pattern_from\n#pragma mapbox: initialize mediump vec4 pattern_to\n#pragma mapbox: initialize lowp float pixel_ratio_from\n#pragma mapbox: initialize lowp float pixel_ratio_to\nvec2 pattern_tl_a=pattern_from.xy;vec2 pattern_br_a=pattern_from.zw;vec2 pattern_tl_b=pattern_to.xy;vec2 pattern_br_b=pattern_to.zw;vec2 imagecoord=mod(v_pos_a,1.0);vec2 pos=mix(pattern_tl_a/u_texsize,pattern_br_a/u_texsize,imagecoord);vec4 color1=texture2D(u_image,pos);vec2 imagecoord_b=mod(v_pos_b,1.0);vec2 pos2=mix(pattern_tl_b/u_texsize,pattern_br_b/u_texsize,imagecoord_b);vec4 color2=texture2D(u_image,pos2);vec4 mixedColor=mix(color1,color2,u_fade);gl_FragColor=mixedColor*v_lighting;\n#ifdef OVERDRAW_INSPECTOR\ngl_FragColor=vec4(1.0);\n#endif\n}';
 
 // This file is generated. Edit build/generate-shaders.ts, then run `npm run codegen`.
-var fillExtrusionPatternVert = 'uniform mat4 u_matrix;uniform vec2 u_pixel_coord_upper;uniform vec2 u_pixel_coord_lower;uniform float u_height_factor;uniform vec3 u_scale;uniform float u_vertical_gradient;uniform lowp float u_opacity;uniform vec3 u_lightcolor;uniform lowp vec3 u_lightpos;uniform lowp float u_lightintensity;attribute vec2 a_pos;attribute vec4 a_normal_ed;\n#ifdef TERRAIN3D\nattribute vec2 a_centroid;\n#endif\nvarying vec2 v_pos_a;varying vec2 v_pos_b;varying vec4 v_lighting;\n#pragma mapbox: define lowp float base\n#pragma mapbox: define lowp float height\n#pragma mapbox: define lowp vec4 pattern_from\n#pragma mapbox: define lowp vec4 pattern_to\n#pragma mapbox: define lowp float pixel_ratio_from\n#pragma mapbox: define lowp float pixel_ratio_to\nvoid main() {\n#pragma mapbox: initialize lowp float base\n#pragma mapbox: initialize lowp float height\n#pragma mapbox: initialize mediump vec4 pattern_from\n#pragma mapbox: initialize mediump vec4 pattern_to\n#pragma mapbox: initialize lowp float pixel_ratio_from\n#pragma mapbox: initialize lowp float pixel_ratio_to\nvec2 pattern_tl_a=pattern_from.xy;vec2 pattern_br_a=pattern_from.zw;vec2 pattern_tl_b=pattern_to.xy;vec2 pattern_br_b=pattern_to.zw;float tileRatio=u_scale.x;float fromScale=u_scale.y;float toScale=u_scale.z;vec3 normal=a_normal_ed.xyz;float edgedistance=a_normal_ed.w;vec2 display_size_a=(pattern_br_a-pattern_tl_a)/pixel_ratio_from;vec2 display_size_b=(pattern_br_b-pattern_tl_b)/pixel_ratio_to;\n#ifdef TERRAIN3D\nfloat baseDelta=10.0;float ele=get_elevation(a_centroid);\n#else\nfloat baseDelta=0.0;float ele=0.0;\n#endif\nbase=max(0.0,ele+base-baseDelta);height=max(0.0,ele+height);float t=mod(normal.x,2.0);float z=t > 0.0 ? height : base;gl_Position=u_matrix*vec4(a_pos,z,1);vec2 pos=normal.x==1.0 && normal.y==0.0 && normal.z==16384.0\n? a_pos\n: vec2(edgedistance,z*u_height_factor);v_pos_a=get_pattern_pos(u_pixel_coord_upper,u_pixel_coord_lower,fromScale*display_size_a,tileRatio,pos);v_pos_b=get_pattern_pos(u_pixel_coord_upper,u_pixel_coord_lower,toScale*display_size_b,tileRatio,pos);v_lighting=vec4(0.0,0.0,0.0,1.0);float directional=clamp(dot(normal/16383.0,u_lightpos),0.0,1.0);directional=mix((1.0-u_lightintensity),max((0.5+u_lightintensity),1.0),directional);if (normal.y !=0.0) {directional*=((1.0-u_vertical_gradient)+(u_vertical_gradient*clamp((t+base)*pow(height/150.0,0.5),mix(0.7,0.98,1.0-u_lightintensity),1.0)));}v_lighting.rgb+=clamp(directional*u_lightcolor,mix(vec3(0.0),vec3(0.3),1.0-u_lightcolor),vec3(1.0));v_lighting*=u_opacity;}';
+var fillExtrusionPatternVert = 'uniform mat4 u_matrix;uniform vec2 u_pixel_coord_upper;uniform vec2 u_pixel_coord_lower;uniform float u_height_factor;uniform vec3 u_scale;uniform float u_vertical_gradient;uniform lowp float u_opacity;uniform vec3 u_lightcolor;uniform lowp vec3 u_lightpos;uniform lowp float u_lightintensity;attribute vec2 a_pos;attribute vec4 a_normal_ed;\n#ifdef TERRAIN3D\nattribute vec2 a_centroid;\n#endif\nvarying vec2 v_pos_a;varying vec2 v_pos_b;varying vec4 v_lighting;\n#pragma mapbox: define lowp float base\n#pragma mapbox: define lowp float height\n#pragma mapbox: define lowp vec4 pattern_from\n#pragma mapbox: define lowp vec4 pattern_to\n#pragma mapbox: define lowp float pixel_ratio_from\n#pragma mapbox: define lowp float pixel_ratio_to\nvoid main() {\n#pragma mapbox: initialize lowp float base\n#pragma mapbox: initialize lowp float height\n#pragma mapbox: initialize mediump vec4 pattern_from\n#pragma mapbox: initialize mediump vec4 pattern_to\n#pragma mapbox: initialize lowp float pixel_ratio_from\n#pragma mapbox: initialize lowp float pixel_ratio_to\nvec2 pattern_tl_a=pattern_from.xy;vec2 pattern_br_a=pattern_from.zw;vec2 pattern_tl_b=pattern_to.xy;vec2 pattern_br_b=pattern_to.zw;float tileRatio=u_scale.x;float fromScale=u_scale.y;float toScale=u_scale.z;vec3 normal=a_normal_ed.xyz;float edgedistance=a_normal_ed.w;vec2 display_size_a=(pattern_br_a-pattern_tl_a)/pixel_ratio_from;vec2 display_size_b=(pattern_br_b-pattern_tl_b)/pixel_ratio_to;\n#ifdef TERRAIN3D\nfloat height_terrain3d_offset=get_elevation(a_centroid);float base_terrain3d_offset=height_terrain3d_offset-(base > 0.0 ? 0.0 : 10.0);\n#else\nfloat height_terrain3d_offset=0.0;float base_terrain3d_offset=0.0;\n#endif\nbase=max(0.0,base)+base_terrain3d_offset;height=max(0.0,height)+height_terrain3d_offset;float t=mod(normal.x,2.0);float z=t > 0.0 ? height : base;gl_Position=u_matrix*vec4(a_pos,z,1);vec2 pos=normal.x==1.0 && normal.y==0.0 && normal.z==16384.0\n? a_pos\n: vec2(edgedistance,z*u_height_factor);v_pos_a=get_pattern_pos(u_pixel_coord_upper,u_pixel_coord_lower,fromScale*display_size_a,tileRatio,pos);v_pos_b=get_pattern_pos(u_pixel_coord_upper,u_pixel_coord_lower,toScale*display_size_b,tileRatio,pos);v_lighting=vec4(0.0,0.0,0.0,1.0);float directional=clamp(dot(normal/16383.0,u_lightpos),0.0,1.0);directional=mix((1.0-u_lightintensity),max((0.5+u_lightintensity),1.0),directional);if (normal.y !=0.0) {directional*=((1.0-u_vertical_gradient)+(u_vertical_gradient*clamp((t+base)*pow(height/150.0,0.5),mix(0.7,0.98,1.0-u_lightintensity),1.0)));}v_lighting.rgb+=clamp(directional*u_lightcolor,mix(vec3(0.0),vec3(0.3),1.0-u_lightcolor),vec3(1.0));v_lighting*=u_opacity;}';
 
 // This file is generated. Edit build/generate-shaders.ts, then run `npm run codegen`.
 var hillshadePrepareFrag = '#ifdef GL_ES\nprecision highp float;\n#endif\nuniform sampler2D u_image;varying vec2 v_pos;uniform vec2 u_dimension;uniform float u_zoom;uniform vec4 u_unpack;float getElevation(vec2 coord,float bias) {vec4 data=texture2D(u_image,coord)*255.0;data.a=-1.0;return dot(data,u_unpack)/4.0;}void main() {vec2 epsilon=1.0/u_dimension;float a=getElevation(v_pos+vec2(-epsilon.x,-epsilon.y),0.0);float b=getElevation(v_pos+vec2(0,-epsilon.y),0.0);float c=getElevation(v_pos+vec2(epsilon.x,-epsilon.y),0.0);float d=getElevation(v_pos+vec2(-epsilon.x,0),0.0);float e=getElevation(v_pos,0.0);float f=getElevation(v_pos+vec2(epsilon.x,0),0.0);float g=getElevation(v_pos+vec2(-epsilon.x,epsilon.y),0.0);float h=getElevation(v_pos+vec2(0,epsilon.y),0.0);float i=getElevation(v_pos+vec2(epsilon.x,epsilon.y),0.0);float exaggerationFactor=u_zoom < 2.0 ? 0.4 : u_zoom < 4.5 ? 0.35 : 0.3;float exaggeration=u_zoom < 15.0 ? (u_zoom-15.0)*exaggerationFactor : 0.0;vec2 deriv=vec2((c+f+f+i)-(a+d+d+g),(g+h+h+i)-(a+b+b+c))/pow(2.0,exaggeration+(19.2562-u_zoom));gl_FragColor=clamp(vec4(deriv.x/2.0+0.5,deriv.y/2.0+0.5,1.0,1.0),0.0,1.0);\n#ifdef OVERDRAW_INSPECTOR\ngl_FragColor=vec4(1.0);\n#endif\n}';
@@ -46613,20 +46498,23 @@ class Transform {
     }
     clone() {
         const clone = new Transform(this._minZoom, this._maxZoom, this._minPitch, this.maxPitch, this._renderWorldCopies);
-        clone.tileSize = this.tileSize;
-        clone.latRange = this.latRange;
-        clone.width = this.width;
-        clone.height = this.height;
-        clone._center = this._center;
-        clone._elevation = this._elevation;
-        clone.zoom = this.zoom;
-        clone.angle = this.angle;
-        clone._fov = this._fov;
-        clone._pitch = this._pitch;
-        clone._unmodified = this._unmodified;
-        clone._edgeInsets = this._edgeInsets.clone();
-        clone._calcMatrices();
+        clone.apply(this);
         return clone;
+    }
+    apply(that) {
+        this.tileSize = that.tileSize;
+        this.latRange = that.latRange;
+        this.width = that.width;
+        this.height = that.height;
+        this._center = that._center;
+        this._elevation = that._elevation;
+        this.zoom = that.zoom;
+        this.angle = that.angle;
+        this._fov = that._fov;
+        this._pitch = that._pitch;
+        this._unmodified = that._unmodified;
+        this._edgeInsets = that._edgeInsets.clone();
+        this._calcMatrices();
     }
     get minZoom() { return this._minZoom; }
     set minZoom(zoom) {
@@ -47877,6 +47765,35 @@ class BlockableMapEventHandler {
 }
 
 /**
+ * Shared utilities for the Handler classes to access the correct camera state.
+ * If Camera.transformCameraUpdate is specified, the "desired state" of camera may differ from the state used for rendering.
+ * The handlers need the "desired state" to track accumulated changes.
+ */
+class TransformProvider {
+    constructor(map) {
+        this._map = map;
+    }
+    get transform() {
+        return this._map._requestedCameraState || this._map.transform;
+    }
+    get center() {
+        return { lng: this.transform.center.lng, lat: this.transform.center.lat };
+    }
+    get zoom() {
+        return this.transform.zoom;
+    }
+    get pitch() {
+        return this.transform.pitch;
+    }
+    get bearing() {
+        return this.transform.bearing;
+    }
+    unproject(point) {
+        return this.transform.pointLocation(performance.Point.convert(point), this._map.terrain);
+    }
+}
+
+/**
  * The `BoxZoomHandler` allows the user to zoom the map to fit within a bounding box.
  * The bounding box is defined by clicking and holding `shift` while dragging the cursor.
  */
@@ -47886,6 +47803,7 @@ class BoxZoomHandler {
      */
     constructor(map, options) {
         this._map = map;
+        this._tr = new TransformProvider(map);
         this._el = map.getCanvasContainer();
         this._container = map.getContainer();
         this._clickTolerance = options.clickTolerance || 1;
@@ -47970,7 +47888,7 @@ class BoxZoomHandler {
         else {
             this._map.fire(new performance.Event('boxzoomend', { originalEvent: e }));
             return {
-                cameraAnimation: map => map.fitScreenCoordinates(p0, p1, this._map.getBearing(), { linear: true })
+                cameraAnimation: map => map.fitScreenCoordinates(p0, p1, this._tr.bearing, { linear: true })
             };
         }
     }
@@ -48106,7 +48024,8 @@ class TapRecognizer {
 }
 
 class TapZoomHandler {
-    constructor() {
+    constructor(map) {
+        this._tr = new TransformProvider(map);
         this._zoomIn = new TapRecognizer({
             numTouches: 1,
             numTaps: 2
@@ -48133,6 +48052,7 @@ class TapZoomHandler {
     touchend(e, points, mapTouches) {
         const zoomInPoint = this._zoomIn.touchend(e, points, mapTouches);
         const zoomOutPoint = this._zoomOut.touchend(e, points, mapTouches);
+        const tr = this._tr;
         if (zoomInPoint) {
             this._active = true;
             e.preventDefault();
@@ -48140,8 +48060,8 @@ class TapZoomHandler {
             return {
                 cameraAnimation: (map) => map.easeTo({
                     duration: 300,
-                    zoom: map.getZoom() + 1,
-                    around: map.unproject(zoomInPoint)
+                    zoom: tr.zoom + 1,
+                    around: tr.unproject(zoomInPoint)
                 }, { originalEvent: e })
             };
         }
@@ -48152,8 +48072,8 @@ class TapZoomHandler {
             return {
                 cameraAnimation: (map) => map.easeTo({
                     duration: 300,
-                    zoom: map.getZoom() - 1,
-                    around: map.unproject(zoomOutPoint)
+                    zoom: tr.zoom - 1,
+                    around: tr.unproject(zoomOutPoint)
                 }, { originalEvent: e })
             };
         }
@@ -48714,7 +48634,8 @@ class KeyboardHandler {
     /**
     * @private
     */
-    constructor() {
+    constructor(map) {
+        this._tr = new TransformProvider(map);
         const stepOptions = defaultOptions$5;
         this._panStep = stepOptions.panStep;
         this._bearingStep = stepOptions.bearingStep;
@@ -48789,16 +48710,16 @@ class KeyboardHandler {
         }
         return {
             cameraAnimation: (map) => {
-                const zoom = map.getZoom();
+                const tr = this._tr;
                 map.easeTo({
                     duration: 300,
                     easeId: 'keyboardHandler',
                     easing: easeOut,
-                    zoom: zoomDir ? Math.round(zoom) + zoomDir * (e.shiftKey ? 2 : 1) : zoom,
-                    bearing: map.getBearing() + bearingDir * this._bearingStep,
-                    pitch: map.getPitch() + pitchDir * this._pitchStep,
+                    zoom: zoomDir ? Math.round(tr.zoom) + zoomDir * (e.shiftKey ? 2 : 1) : tr.zoom,
+                    bearing: tr.bearing + bearingDir * this._bearingStep,
+                    pitch: tr.pitch + pitchDir * this._pitchStep,
                     offset: [-xDir * this._panStep, -yDir * this._panStep],
-                    center: map.getCenter()
+                    center: tr.center
                 }, { originalEvent: e });
             }
         };
@@ -48885,6 +48806,7 @@ class ScrollZoomHandler {
      */
     constructor(map, handler) {
         this._map = map;
+        this._tr = new TransformProvider(map);
         this._el = map.getCanvasContainer();
         this._handler = handler;
         this._delta = 0;
@@ -49035,8 +48957,9 @@ class ScrollZoomHandler {
             delete this._finishTimeout;
         }
         const pos = DOM.mousePos(this._el, e);
-        this._around = performance.LngLat.convert(this._aroundCenter ? this._map.getCenter() : this._map.unproject(pos));
-        this._aroundPoint = this._map.transform.locationPoint(this._around);
+        const tr = this._tr;
+        this._around = performance.LngLat.convert(this._aroundCenter ? tr.center : tr.unproject(pos));
+        this._aroundPoint = tr.transform.locationPoint(this._around);
         if (!this._frameId) {
             this._frameId = true;
             this._handler._triggerRenderFrame();
@@ -49048,7 +48971,7 @@ class ScrollZoomHandler {
         this._frameId = null;
         if (!this.isActive())
             return;
-        const tr = this._map.transform;
+        const tr = this._tr.transform;
         // if we've had scroll events since the last render frame, consume the
         // accumulated delta, and update the target zoom level accordingly
         if (this._delta !== 0) {
@@ -49182,7 +49105,8 @@ class DoubleClickZoomHandler {
 }
 
 class ClickZoomHandler {
-    constructor() {
+    constructor(map) {
+        this._tr = new TransformProvider(map);
         this.reset();
     }
     reset() {
@@ -49194,8 +49118,8 @@ class ClickZoomHandler {
             cameraAnimation: (map) => {
                 map.easeTo({
                     duration: 300,
-                    zoom: map.getZoom() + (e.shiftKey ? -1 : 1),
-                    around: map.unproject(point)
+                    zoom: this._tr.zoom + (e.shiftKey ? -1 : 1),
+                    around: this._tr.unproject(point)
                 }, { originalEvent: e });
             }
         };
@@ -49576,8 +49500,8 @@ class HandlerManager {
         this._add('mapEvent', new MapEventHandler(map, options));
         const boxZoom = map.boxZoom = new BoxZoomHandler(map, options);
         this._add('boxZoom', boxZoom);
-        const tapZoom = new TapZoomHandler();
-        const clickZoom = new ClickZoomHandler();
+        const tapZoom = new TapZoomHandler(map);
+        const clickZoom = new ClickZoomHandler(map);
         map.doubleClickZoom = new DoubleClickZoomHandler(clickZoom, tapZoom);
         this._add('tapZoom', tapZoom);
         this._add('clickZoom', clickZoom);
@@ -49602,7 +49526,7 @@ class HandlerManager {
         this._add('touchZoom', touchZoom, ['touchPan', 'touchRotate']);
         const scrollZoom = map.scrollZoom = new ScrollZoomHandler(map, this);
         this._add('scrollZoom', scrollZoom, ['mousePan']);
-        const keyboard = map.keyboard = new KeyboardHandler();
+        const keyboard = map.keyboard = new KeyboardHandler(map);
         this._add('keyboard', keyboard);
         this._add('blockableMapEvent', new BlockableMapEventHandler(map));
         for (const name of ['boxZoom', 'doubleClickZoom', 'tapDragZoom', 'touchPitch', 'dragRotate', 'dragPan', 'touchZoomRotate', 'scrollZoom', 'keyboard']) {
@@ -49771,7 +49695,7 @@ class HandlerManager {
     }
     _updateMapTransform(combinedResult, combinedEventsInProgress, deactivatedHandlers) {
         const map = this._map;
-        const tr = map.transform;
+        const tr = map._getTransformForUpdate();
         const terrain = map.terrain;
         if (!hasChange(combinedResult) && !(terrain && this._terrainMovement)) {
             return this._fireEvents(combinedEventsInProgress, deactivatedHandlers, true);
@@ -49819,6 +49743,7 @@ class HandlerManager {
                 tr.setLocationAtPoint(loc, around);
             }
         }
+        map._applyUpdatedTransform(tr);
         this._map._update();
         if (!combinedResult.noInertia)
             this._inertia.record(combinedResult);
@@ -49933,6 +49858,9 @@ class Camera extends performance.Evented {
         this._bearingSnap = options.bearingSnap;
         performance.bindAll(['_renderFrameCallback'], this);
         //addAssertions(this);
+        this.on('moveend', () => {
+            delete this._requestedCameraState;
+        });
     }
     /**
      * Returns the map's geographical centerpoint.
@@ -50450,7 +50378,7 @@ class Camera extends performance.Evented {
      */
     jumpTo(options, eventData) {
         this.stop();
-        const tr = this.transform;
+        const tr = this._getTransformForUpdate();
         let zoomChanged = false, bearingChanged = false, pitchChanged = false;
         if ('zoom' in options && tr.zoom !== +options.zoom) {
             zoomChanged = true;
@@ -50470,6 +50398,7 @@ class Camera extends performance.Evented {
         if (options.padding != null && !tr.isPaddingEqual(options.padding)) {
             tr.padding = options.padding;
         }
+        this._applyUpdatedTransform(tr);
         this.fire(new performance.Event('movestart', eventData))
             .fire(new performance.Event('move', eventData));
         if (zoomChanged) {
@@ -50555,7 +50484,7 @@ class Camera extends performance.Evented {
         }, options);
         if (options.animate === false || (!options.essential && performance.exported.prefersReducedMotion))
             options.duration = 0;
-        const tr = this.transform, startZoom = this.getZoom(), startBearing = this.getBearing(), startPitch = this.getPitch(), startPadding = this.getPadding(), zoom = 'zoom' in options ? +options.zoom : startZoom, bearing = 'bearing' in options ? this._normalizeBearing(options.bearing, startBearing) : startBearing, pitch = 'pitch' in options ? +options.pitch : startPitch, padding = 'padding' in options ? options.padding : tr.padding;
+        const tr = this._getTransformForUpdate(), startZoom = this.getZoom(), startBearing = this.getBearing(), startPitch = this.getPitch(), startPadding = this.getPadding(), zoom = 'zoom' in options ? +options.zoom : startZoom, bearing = 'bearing' in options ? this._normalizeBearing(options.bearing, startBearing) : startBearing, pitch = 'pitch' in options ? +options.pitch : startPitch, padding = 'padding' in options ? options.padding : tr.padding;
         const offsetAsPoint = performance.Point.convert(options.offset);
         let pointAtOffset = tr.centerPoint.add(offsetAsPoint);
         const locationAtOffset = tr.pointLocation(pointAtOffset);
@@ -50613,6 +50542,7 @@ class Camera extends performance.Evented {
                 const newCenter = tr.unproject(from.add(delta.mult(k * speedup)).mult(scale));
                 tr.setLocationAtPoint(tr.renderWorldCopies ? newCenter.wrap() : newCenter, pointAtOffset);
             }
+            this._applyUpdatedTransform(tr);
             this._fireMoveEvents(eventData);
         }, (interruptingEaseId) => {
             if (this.terrain)
@@ -50656,6 +50586,43 @@ class Camera extends performance.Evented {
     _finalizeElevation() {
         this.transform.freezeElevation = false;
         this.transform.recalculateZoom(this.terrain);
+    }
+    /**
+     * Called when the camera is about to be manipulated.
+     * If `transformCameraUpdate` is specified, a copy of the current transform is created to track the accumulated changes.
+     * This underlying transform represents the "desired state" proposed by input handlers / animations / UI controls.
+     * It may differ from the state used for rendering (`this.transform`).
+     * @returns Transform to apply changes to
+     */
+    _getTransformForUpdate() {
+        if (!this.transformCameraUpdate)
+            return this.transform;
+        if (!this._requestedCameraState) {
+            this._requestedCameraState = this.transform.clone();
+        }
+        return this._requestedCameraState;
+    }
+    /**
+     * Called after the camera is done being manipulated.
+     * @param {Transform} tr - the requested camera end state
+     * Call `transformCameraUpdate` if present, and then apply the "approved" changes.
+     */
+    _applyUpdatedTransform(tr) {
+        if (!this.transformCameraUpdate)
+            return;
+        const nextTransform = tr.clone();
+        const { center, zoom, pitch, bearing, elevation } = this.transformCameraUpdate(nextTransform);
+        if (center)
+            nextTransform.center = center;
+        if (zoom !== undefined)
+            nextTransform.zoom = zoom;
+        if (pitch !== undefined)
+            nextTransform.pitch = pitch;
+        if (bearing !== undefined)
+            nextTransform.bearing = bearing;
+        if (elevation !== undefined)
+            nextTransform.elevation = elevation;
+        this.transform.apply(nextTransform);
     }
     _fireMoveEvents(eventData) {
         this.fire(new performance.Event('move', eventData));
@@ -50774,7 +50741,7 @@ class Camera extends performance.Evented {
             curve: 1.42,
             easing: performance.ease
         }, options);
-        const tr = this.transform, startZoom = this.getZoom(), startBearing = this.getBearing(), startPitch = this.getPitch(), startPadding = this.getPadding();
+        const tr = this._getTransformForUpdate(), startZoom = this.getZoom(), startBearing = this.getBearing(), startPitch = this.getPitch(), startPadding = this.getPadding();
         const zoom = 'zoom' in options ? performance.clamp(+options.zoom, tr.minZoom, tr.maxZoom) : startZoom;
         const bearing = 'bearing' in options ? this._normalizeBearing(options.bearing, startBearing) : startBearing;
         const pitch = 'pitch' in options ? +options.pitch : startPitch;
@@ -50879,6 +50846,7 @@ class Camera extends performance.Evented {
                 this._updateElevation(k);
             const newCenter = k === 1 ? center : tr.unproject(from.add(delta.mult(u(s))).mult(scale));
             tr.setLocationAtPoint(tr.renderWorldCopies ? newCenter.wrap() : newCenter, pointAtOffset);
+            this._applyUpdatedTransform(tr);
             this._fireMoveEvents(eventData);
         }, () => {
             if (this.terrain)
@@ -51996,6 +51964,7 @@ const defaultOptions$4 = {
     maxTileCacheSize: null,
     localIdeographFontFamily: 'sans-serif',
     transformRequest: null,
+    transformCameraUpdate: null,
     fadeDuration: 300,
     crossSourceCollisions: true,
     validateStyle: true
@@ -52072,6 +52041,8 @@ const defaultOptions$4 = {
  * The purpose of this option is to avoid bandwidth-intensive glyph server requests. (See [Use locally generated ideographs](https://maplibre.org/maplibre-gl-js-docs/example/local-ideographs).)
  * @param {RequestTransformFunction} [options.transformRequest=null] A callback run before the Map makes a request for an external URL. The callback can be used to modify the url, set headers, or set the credentials property for cross-origin requests.
  * Expected to return an object with a `url` property and optionally `headers` and `credentials` properties.
+ * @param {CameraUpdateTransformFunction} [options.transformCameraUpdate=null] A callback run before the Map's camera is moved due to user input or animation. The callback can be used to modify the new center, zoom, pitch and bearing.
+ * Expected to return an object containing center, zoom, pitch or bearing values to overwrite.
  * @param {boolean} [options.collectResourceTiming=false] If `true`, Resource Timing API information will be collected for requests made by GeoJSON and Vector Tile web workers (this information is normally inaccessible from the main Javascript thread). Information will be returned in a `resourceTiming` property of relevant `data` events.
  * @param {number} [options.fadeDuration=300] Controls the duration of the fade-in/fade-out animation for label collisions after initial map load, in milliseconds. This setting affects all symbol layers. This setting does not affect the duration of runtime styling transitions or raster tile cross-fading.
  * @param {boolean} [options.crossSourceCollisions=true] If `true`, symbols from multiple sources can collide with each other during collision detection. If `false`, collision detection is run separately for the symbols in each source.
@@ -52135,6 +52106,7 @@ let Map$1 = class Map extends Camera {
         this._locale = performance.extend({}, defaultLocale, options.locale);
         this._clickTolerance = options.clickTolerance;
         this._pixelRatio = (_a = options.pixelRatio) !== null && _a !== void 0 ? _a : devicePixelRatio;
+        this.transformCameraUpdate = options.transformCameraUpdate;
         this._imageQueueHandle = ImageRequest$1.addThrottleControl(() => this.isMoving());
         this._requestManager = new RequestManager(options.transformRequest);
         if (typeof options.container === 'string') {
@@ -52171,7 +52143,12 @@ let Map$1 = class Map extends Camera {
         this.once('idle', () => { this._idleTriggered = true; });
         if (typeof window !== 'undefined') {
             addEventListener('online', this._onWindowOnline, false);
+            let initialResizeEventCaptured = false;
             this._resizeObserver = new ResizeObserver((entries) => {
+                if (!initialResizeEventCaptured) {
+                    initialResizeEventCaptured = true;
+                    return;
+                }
                 if (this._trackResize) {
                     this.resize(entries)._update();
                 }
@@ -52330,11 +52307,13 @@ let Map$1 = class Map extends Camera {
      * if (mapDiv.style.visibility === true) map.resize();
      */
     resize(eventData) {
+        var _a;
         const dimensions = this._containerDimensions();
         const width = dimensions[0];
         const height = dimensions[1];
         this._resizeCanvas(width, height, this.getPixelRatio());
         this.transform.resize(width, height);
+        (_a = this._requestedCameraState) === null || _a === void 0 ? void 0 : _a.resize(width, height);
         this.painter.resize(width, height, this.getPixelRatio());
         const fireMoving = !this._moving;
         if (fireMoving) {
@@ -54216,14 +54195,6 @@ let Map$1 = class Map extends Camera {
         if (this.terrain)
             this.terrain.sourceCache.update(this.transform, this.terrain);
         this.transform.updateElevation(this.terrain);
-        // a bit of counter intuitive:
-        // - when map is moving (throttled) image queue does not auto advance so need manually process it for each render
-        // or it may miss raster tiles.
-        // - when not moving (initial load or changing styles), image queue is self-driven to finish. manual process
-        // is not doing anything but wasting time.
-        if (this.isMoving()) {
-            ImageRequest$1.processQueue();
-        }
         this._placementDirty = this.style && this.style._updatePlacement(this.painter.transform, this.showCollisionBoxes, fadeDuration, this._crossSourceCollisions);
         // Actually draw
         this.painter.render(this.style, {

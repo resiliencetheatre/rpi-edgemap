@@ -2706,6 +2706,8 @@ export declare class SourceCache extends Evented {
 	_loadedParentTiles: {
 		[_: string]: Tile;
 	};
+	_didEmitContent: boolean;
+	_updated: boolean;
 	static maxUnderzooming: number;
 	static maxOverzooming: number;
 	constructor(id: string, options: SourceSpecification, dispatcher: Dispatcher);
@@ -3762,6 +3764,7 @@ export declare class Transform {
 	};
 	constructor(minZoom?: number, maxZoom?: number, minPitch?: number, maxPitch?: number, renderWorldCopies?: boolean);
 	clone(): Transform;
+	apply(that: Transform): void;
 	get minZoom(): number;
 	set minZoom(zoom: number);
 	get maxZoom(): number;
@@ -4060,8 +4063,8 @@ export declare class Tile {
 	expirationTime: any;
 	expiredRequestCount: number;
 	state: TileState;
-	timeAdded: any;
-	fadeEndTime: any;
+	timeAdded: number;
+	fadeEndTime: number;
 	collisionBoxArray: CollisionBoxArray;
 	redoWhenDone: boolean;
 	showCollisionBoxes: boolean;
@@ -6044,6 +6047,19 @@ export type AnimationOptions = {
 	essential?: boolean;
 	freezeElevation?: boolean;
 };
+export type CameraUpdateTransformFunction = (next: {
+	center: LngLat;
+	zoom: number;
+	pitch: number;
+	bearing: number;
+	elevation: number;
+}) => {
+	center?: LngLat;
+	zoom?: number;
+	pitch?: number;
+	bearing?: number;
+	elevation?: number;
+};
 declare abstract class Camera extends Evented {
 	transform: Transform;
 	terrain: Terrain;
@@ -6065,6 +6081,12 @@ declare abstract class Camera extends Evented {
 	_elevationCenter: LngLat;
 	_elevationTarget: number;
 	_elevationStart: number;
+	/** Used to track accumulated changes during continuous interaction */
+	_requestedCameraState?: Transform;
+	/** A callback used to defer camera updates or apply arbitrary constraints.
+	 * If specified, this Camera instance can be used as a stateless component in React etc.
+	 */
+	transformCameraUpdate: CameraUpdateTransformFunction | null;
 	abstract _requestRenderFrame(a: () => void): TaskID;
 	abstract _cancelRenderFrame(_: TaskID): void;
 	constructor(transform: Transform, options: {
@@ -6507,6 +6529,20 @@ declare abstract class Camera extends Evented {
 	_prepareElevation(center: LngLat): void;
 	_updateElevation(k: number): void;
 	_finalizeElevation(): void;
+	/**
+	 * Called when the camera is about to be manipulated.
+	 * If `transformCameraUpdate` is specified, a copy of the current transform is created to track the accumulated changes.
+	 * This underlying transform represents the "desired state" proposed by input handlers / animations / UI controls.
+	 * It may differ from the state used for rendering (`this.transform`).
+	 * @returns Transform to apply changes to
+	 */
+	_getTransformForUpdate(): Transform;
+	/**
+	 * Called after the camera is done being manipulated.
+	 * @param {Transform} tr - the requested camera end state
+	 * Call `transformCameraUpdate` if present, and then apply the "approved" changes.
+	 */
+	_applyUpdatedTransform(tr: Transform): void;
 	_fireMoveEvents(eventData?: any): void;
 	_afterEase(eventData?: any, easeId?: string): void;
 	/**
@@ -6600,7 +6636,7 @@ export type MapLayerMouseEvent = MapMouseEvent & {
 export type MapLayerTouchEvent = MapTouchEvent & {
 	features?: MapGeoJSONFeature[];
 };
-export type MapSourceDataType = "content" | "metadata";
+export type MapSourceDataType = "content" | "metadata" | "visibility" | "idle";
 export type MapLayerEventType = {
 	click: MapLayerMouseEvent;
 	dblclick: MapLayerMouseEvent;
@@ -6789,13 +6825,20 @@ export type MapLibreZoomEvent = {
  * - `'source'`: The non-tile data associated with any source
  * - `'style'`: The [style](https://maplibre.org/maplibre-style-spec/) used by the map
  *
+ * Possible values for `sourceDataType`s are:
+ *
+ * - `'metadata'`: indicates that any necessary source metadata has been loaded (such as TileJSON) and it is ok to start loading tiles
+ * - `'content'`: indicates the source data has changed (such as when source.setData() has been called on GeoJSONSource)
+ * - `'visibility'`: send when the source becomes used when at least one of its layers becomes visible in style sense (inside the layer's zoom range and with layout.visibility set to 'visible')
+ * - `'idle'`: indicates that no new source data has been fetched (but the source has done loading)
+ *
  * @typedef {Object} MapDataEvent
  * @property {string} type The event type.
  * @property {string} dataType The type of data that has changed. One of `'source'`, `'style'`.
  * @property {boolean} [isSourceLoaded] True if the event has a `dataType` of `source` and the source has no outstanding network requests.
  * @property {Object} [source] The [style spec representation of the source](https://maplibre.org/maplibre-style-spec/#sources) if the event has a `dataType` of `source`.
  * @property {string} [sourceDataType] Included if the event has a `dataType` of `source` and the event signals
- * that internal data has been received or changed. Possible values are `metadata`, `content` and `visibility`.
+ * that internal data has been received or changed. Possible values are `metadata`, `content`, `visibility` and `idle`.
  * @property {Object} [tile] The tile being loaded or changed, if the event has a `dataType` of `source` and
  * the event is related to loading of a tile.
  * @property {Coordinates} [coord] The coordinate of the tile if the event has a `dataType` of `source` and
@@ -7882,6 +7925,19 @@ export type MapEvent =
  * });
  */
  | "sourcedataabort";
+export declare class TransformProvider {
+	_map: Map;
+	constructor(map: Map);
+	get transform(): Transform;
+	get center(): {
+		lng: number;
+		lat: number;
+	};
+	get zoom(): number;
+	get pitch(): number;
+	get bearing(): number;
+	unproject(point: PointLike): LngLat;
+}
 /**
  * The scroll zoom handler options object
  */
@@ -7893,6 +7949,7 @@ export type ScrollZoomHandlerOptions = {
 };
 export declare class ScrollZoomHandler {
 	_map: Map;
+	_tr: TransformProvider;
 	_el: HTMLElement;
 	_enabled: boolean;
 	_active: boolean;
@@ -7981,6 +8038,7 @@ export declare class ScrollZoomHandler {
 }
 export declare class BoxZoomHandler {
 	_map: Map;
+	_tr: TransformProvider;
 	_el: HTMLElement;
 	_container: HTMLElement;
 	_enabled: boolean;
@@ -8159,6 +8217,7 @@ export declare class DragRotateHandler {
 	isActive(): boolean;
 }
 export declare class KeyboardHandler {
+	_tr: TransformProvider;
 	_enabled: boolean;
 	_active: boolean;
 	_panStep: number;
@@ -8168,7 +8227,7 @@ export declare class KeyboardHandler {
 	/**
 	* @private
 	*/
-	constructor();
+	constructor(map: Map);
 	reset(): void;
 	keydown(e: KeyboardEvent): {
 		cameraAnimation: (map: Map) => void;
@@ -8221,9 +8280,10 @@ export declare class KeyboardHandler {
 	enableRotation(): void;
 }
 export declare class ClickZoomHandler {
+	_tr: TransformProvider;
 	_enabled: boolean;
 	_active: boolean;
-	constructor();
+	constructor(map: Map);
 	reset(): void;
 	dblclick(e: MouseEvent, point: Point): {
 		cameraAnimation: (map: Map) => void;
@@ -8265,11 +8325,12 @@ export declare class TapRecognizer {
 	touchend(e: TouchEvent, points: Array<Point>, mapTouches: Array<Touch>): Point;
 }
 export declare class TapZoomHandler {
+	_tr: TransformProvider;
 	_enabled: boolean;
 	_active: boolean;
 	_zoomIn: TapRecognizer;
 	_zoomOut: TapRecognizer;
-	constructor();
+	constructor(map: Map);
 	reset(): void;
 	touchstart(e: TouchEvent, points: Array<Point>, mapTouches: Array<Touch>): void;
 	touchmove(e: TouchEvent, points: Array<Point>, mapTouches: Array<Touch>): void;
@@ -8521,6 +8582,7 @@ export type MapOptions = {
 	renderWorldCopies?: boolean;
 	maxTileCacheSize?: number;
 	transformRequest?: RequestTransformFunction;
+	transformCameraUpdate?: CameraUpdateTransformFunction;
 	locale?: any;
 	fadeDuration?: number;
 	crossSourceCollisions?: boolean;
