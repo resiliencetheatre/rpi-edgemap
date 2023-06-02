@@ -1,11 +1,11 @@
 [Unit]
-Description=tileserver-gl-light
+Description=tileserver-gl-light for wlan0
 After=multi-user.target
 
 [Service]
 WorkingDirectory=/mnt
 KillMode=process
-ExecStart=/bin/tileserver-gl-light --verbose -u "http://192.168.5.74/tileserver" -p 8085 planet.mbtiles
+ExecStart=/bin/tileserver-gl-light --verbose -u "http://10.1.1.1:80/tileserver" -p 8085 planet.mbtiles
 Restart=always
 RestartSec=2
 TimeoutStartSec=5

@@ -1,3 +1,4 @@
+
 [Unit]
 Description=janus webrtc server
 After=multi-user.target
@@ -10,5 +11,3 @@ Restart=always
 RestartSec=2
 TimeoutStartSec=5
 
-[Install]
-WantedBy=multi-user.target
